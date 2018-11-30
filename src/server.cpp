@@ -25,6 +25,9 @@ using namespace std;
 // Return search result to client
 // Usage: server [PORT]
 
+// Don't comment on my coding style
+// It looks ugly, I know.
+
 vector<vector<int>> medIndex;
 vector<vector<int>> sideIndex;
 

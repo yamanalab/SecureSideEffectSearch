@@ -20,15 +20,19 @@ int main (int argc, char *argv[]){
   fdbbasics.close();
 
   string filename(argv[1]);
-  file.insert(0, "../data/");
+  file.insert(0, "../encdata/");
   try{
-    ifstream ftest(filename, std::ios::binary);
+    ifstream ftest(filename.c_str(), std::ios::binary);
   }
-  catch(const std::exception& e){
+  catch(const exception& e){
+    cerr<<" Error "<<e<<endl;
     cout<<" Seems problems within the filename or the file itself. "<<endl;
     cout<<" DB not updated. "<<endl;
     return 1;
   };
+
+  const string numMed_str(argv[2]);
+  const int numMed;
 
   return 0;
 
