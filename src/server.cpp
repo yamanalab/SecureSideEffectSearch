@@ -97,7 +97,17 @@ vector<int> merge(const vector<int> &medID, const vector<int> &sideID){
 
 int main (int argc, char *argv[]){
 
-  ifstream fctxt("context.bin", std::ios::binary);
+  ifsteram fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+  bool dbstatus;
+  assert(fdbbasics>>dbstatus);
+  assert(dbstatus);
+  int numRec, totMed, totSide;
+  assert(fdbbasics>>numRec);
+  assert(fdbbasics>>totMed);
+  assert(fdbbasics>>totSide);
+  fdbbasics.close();
+
+  ifstream fctxt("../settings/context.bin", std::ios::binary);
   unsigned long m, p, r;
   std::vector<long> gens, ords;
   readContextBase(fctxt, m, p, r, gens, ords);
@@ -107,12 +117,12 @@ int main (int argc, char *argv[]){
   //read context from context.bin
 
   FHEPubKey publicKey(context);
-  ifstream fpkey("pk.bin", std::ios::binary);
+  ifstream fpkey("../settings/pk.bin", std::ios::binary);
   assert(fpkey>>publicKey);
   fpkey.close();
   //read publicKey from pk.bin
 
-  ifstream findexmed ("med.inv", std::ios::binary);
+  ifstream findexmed ("../auxdata/med.inv", std::ios::binary);
   int numMed;
   findexmed>>numMed;
   for (int i=0;i<numMed;++i){
@@ -127,8 +137,9 @@ int main (int argc, char *argv[]){
     medIndex.push_back(tempindex);
   }
   findexmed.close();
+  //read invertedindex for medicine from med.inv
 
-  ifstream findexside ("side.inv", std::ios::binary);
+  ifstream findexside ("../auxdata/side.inv", std::ios::binary);
   int numSide;
   findexside>>numSide;
   for (int i=0;i<numSide;++i){
@@ -143,6 +154,7 @@ int main (int argc, char *argv[]){
     sideIndex.push_back(tempindex);
   }
   findexside.close();
+  //read invertedindex for side effects from side.inv
 
   assert(argc==2);
   string port_str(argv[1]);
@@ -184,12 +196,23 @@ int main (int argc, char *argv[]){
       3. Calculate time and memory usage
       */
 
-      /*Part 1 start*/
-
       vector<int> filteredres=merge(MedID, SideID);
 
-      /*Part 1 end*/
+      int numRes=filteredres.size(), numchunks;
+      vector<vector<int>> chunks;
+      for (int i=0;i<numRes;i+=500, ++numchunks){
+        int end=min(i+500, numRes);
+        vector<int> chunk(filteredres.begin()+i, fiteredres.begin()+end);
+        chunks.push_back(chunk);
+      }
 
+      NTL_EXEC_RANGE(numchunks, first, last)
+
+        for (long i=first;i<last;++i){
+
+        }
+
+      NTL_EXEC_RANGE_END
 
       //complete dealing
 

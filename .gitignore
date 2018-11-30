@@ -1,2 +1,7 @@
 # Executables
 *.out
+
+# DB(encrypted)
+auxdata/
+encdata/
+settings/
