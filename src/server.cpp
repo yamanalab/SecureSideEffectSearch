@@ -24,7 +24,7 @@ using namespace std;
 //
 // Return search result to client
 // Usage: server [PORT]
-
+//
 // Don't comment on my coding style
 // It looks ugly, I know.
 
@@ -99,6 +99,10 @@ vector<int> merge(const vector<int> &medID, const vector<int> &sideID){
 }
 
 int main (int argc, char *argv[]){
+
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  // obtain a seed from the system clock
+  std::mt19937 generator(seed);
 
   ifsteram fdbbasics("../settings/dbbasics.bin", std::ios::binary);
   bool dbstatus;
@@ -177,7 +181,7 @@ int main (int argc, char *argv[]){
     acceptor.accept(*client.rdbuf(), err);
     if (!err){
       cout<<"connected"<<endl;
-      Ctxt query_mask;
+      Ctxt query_mask(publicKey);
       client>>query_mask;
       int nMed,nSide;
       vector<int> MedID;
@@ -200,6 +204,7 @@ int main (int argc, char *argv[]){
       Dealing part consist of three parts:
       1. First use merge to do filtering by MedID & SideID
       2. Then split to chunks (500 for each chunk), and do multithreading calculation
+         send the result back to user and get decrypted request
       3. Calculate time and memory usage
       */
 
@@ -221,6 +226,7 @@ int main (int argc, char *argv[]){
       NTL_EXEC_RANGE(numchunks, first, last)
 
         for (long i=first;i<last;++i){
+
           for (int j=0;j<chunks[i].size();++j){
             vector<long> posindicator_long=allzero500_long;
             posindicator_long[j]=1;
@@ -231,14 +237,58 @@ int main (int argc, char *argv[]){
             Ctxt encmask(publicKey);
             assert(fdb>>encmask);
             fdb.close();
+            encmask.multByConstant(posindicator);
+            chunk_res[i].addCtxt(encmask, false);
+            // false means not minus
           }
+
+          vector<Ctxt> rangemul;
+          for (int diff=-5;diff<=5;++diff){
+            Ctxt diffed(publicKey)=chunk_res[i];
+            diffed.addConstant(to_ZZX(diff));
+            rangemul.push_back(diffed);
+          }
+
+          while (rangemul.size()>1){
+            vector<Ctxt> rangemul_derived;
+            for (int j=0;j<rangemul.size();j+=2){
+              if (j+1<rangemul.size()) rangemul[j].multiplyBy(rangemul[j+1]);
+              rangemul_derived.push_back(rangemul[j]);
+            }
+            rangemul=rangemul_derived;
+          }
+          //11 -> 6 -> 3 -> 2 -> 1 , We need at least level of >6
+
+          chunk_res[i]=rangemul[0];
+          chunk_res[i].multByConstant(to_ZZX(generator()%256+1));
+
         }
 
       NTL_EXEC_RANGE_END
 
+      client<<numchunks;
+      client.flush();
+      for (int i=0;i<numchunks;++i){
+        client<<chunk_res[i];
+        client.flush();
+      }
+
+      int numchoice;
+      vector<pair<int,int>> choice_list;
+
+      client>>numchoice;
+      for (int i=0;i<numchoice;++i){
+        int i,j;
+        client>>i>>j;
+        choice_list.push_back(make_pair(i,j));
+      }
       //complete dealing
 
+      for (int i=0;i<numchoice;++i){
+        client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
+      }
       //complete output
+
       client.close();
     }
     else cerr<<"Error: "<<err<<endl;
