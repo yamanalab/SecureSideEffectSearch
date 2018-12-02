@@ -119,6 +119,10 @@ int main (int argc, char *argv[]){
   fctxt.close();
   //read context from context.bin
 
+  ZZX G=context.alMod.getFactorsOverZZ()[0];
+  EncryptedArray ea(context, G);
+  //generate ea from context
+
   FHEPubKey publicKey(context);
   ifstream fpkey("../settings/pk.bin", std::ios::binary);
   assert(fpkey>>publicKey);
@@ -203,16 +207,31 @@ int main (int argc, char *argv[]){
 
       int numRes=filteredres.size(), numchunks;
       vector<vector<int>> chunks;
+      vector<Ctxt> chunk_res;
+      vector<long> allzero500_long(500, 0);
+      Ctxt allzero500(publicKey);
+      ea.encrypt(allzero500, publicKey, allzero500_long);
       for (int i=0;i<numRes;i+=500, ++numchunks){
         int end=min(i+500, numRes);
         vector<int> chunk(filteredres.begin()+i, fiteredres.begin()+end);
         chunks.push_back(chunk);
+        chunk_res.push_back(allzero500);
       }
 
       NTL_EXEC_RANGE(numchunks, first, last)
 
         for (long i=first;i<last;++i){
-
+          for (int j=0;j<chunks[i].size();++j){
+            vector<long> posindicator_long=allzero500_long;
+            posindicator_long[j]=1;
+            ZZX posindicator;
+            ea.encode(posindicator, posindicator_long);
+            string filename="../encdata/"+itos(chunks[i][j]);
+            ifstream fdb(filename.c_str(), std::ios::binary);
+            Ctxt encmask(publicKey);
+            assert(fdb>>encmask);
+            fdb.close();
+          }
         }
 
       NTL_EXEC_RANGE_END
