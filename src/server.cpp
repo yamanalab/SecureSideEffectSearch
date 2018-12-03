@@ -269,8 +269,7 @@ int main (int argc, char *argv[]){
 
       NTL_EXEC_RANGE_END
 
-      client<<numchunks;
-      client.flush();
+      client<<numchunks<<endl;
       for (int i=0;i<numchunks;++i){
         client<<chunk_res[i];
         client.flush();
@@ -283,13 +282,15 @@ int main (int argc, char *argv[]){
       for (int i=0;i<numchoice;++i){
         int i,j;
         client>>i>>j;
-        choice_list.push_back(make_pair(i,j));
+        if (j<chunks[i].size()) choice_list.push_back(make_pair(i,j));
       }
+      unsigned end_timer = std::chrono::system_clock::now().time_since_epoch().count();
       //complete dealing
 
-      for (int i=0;i<numchoice;++i){
-        client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
-      }
+      numchoice=choice_list.size();
+      client<<numchoice<<endl;
+      for (int i=0;i<numchoice;++i) client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
+      client<<end_timer-start_timer<<endl;
       //complete output
 
       client.close();
