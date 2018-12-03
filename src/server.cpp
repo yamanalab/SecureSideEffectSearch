@@ -232,7 +232,7 @@ int main (int argc, char *argv[]){
             posindicator_long[j]=1;
             ZZX posindicator;
             ea.encode(posindicator, posindicator_long);
-            string filename="../encdata/"+itos(chunks[i][j]);
+            string filename="../encdata/"+to_string(chunks[i][j]);
             ifstream fdb(filename.c_str(), std::ios::binary);
             Ctxt encmask(publicKey);
             assert(fdb>>encmask);
