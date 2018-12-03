@@ -198,7 +198,10 @@ int main (int argc, char *argv[]){
         client>>sideid;
         SideID.push_back(sideid);
       }
+
       //complete input
+
+      unsigned start_timer = std::chrono::system_clock::now().time_since_epoch().count();
 
       /*
       Dealing part consist of three parts:
@@ -232,7 +235,7 @@ int main (int argc, char *argv[]){
             posindicator_long[j]=1;
             ZZX posindicator;
             ea.encode(posindicator, posindicator_long);
-            string filename="../encdata/"+to_string(chunks[i][j]);
+            string filename="../encdata/"+to_string(chunks[i][j])+".bin";
             ifstream fdb(filename.c_str(), std::ios::binary);
             Ctxt encmask(publicKey);
             assert(fdb>>encmask);
