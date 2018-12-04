@@ -18,3 +18,6 @@ server: server.cpp
 
 update: update.cpp
 	$(CC) $(INCLUDES) -o update update.cpp $(HELIBDIR) $(CFLAGS)
+
+data_enc: data_enc.cpp
+	$(CC) $(INCLUDES) -o data_enc data_enc.cpp $(HELIBDIR) $(CFLAGS)	

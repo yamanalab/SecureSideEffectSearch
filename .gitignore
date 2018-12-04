@@ -1,11 +1,3 @@
-# Executables
-*.out
-
-# DB(encrypted)
-auxdata/
-encdata/
-settings/
-
 # all unnecessary executables etc. under src/
 src/*
 !src/*.cpp
@@ -13,3 +5,6 @@ src/*
 !src/*.c
 !src/*.h
 !src/Makefile
+
+# Encrypted data
+*.bin

@@ -14,8 +14,8 @@ using namespace std;
 
 int main (void){
 
-  long m = 2048 , p = 257 , r = 1;
-  long L = 4;
+  long m = 16384 , p = 257 , r = 1;
+  long L = 7;
   long c = 3;
   long w = 64;
   long d = 0;
@@ -28,7 +28,8 @@ int main (void){
   buildModChain(context, L, c);
   //modify the context, adding primes to the modulus buildModChain
 
-  assert(context.securityLevel()>=128);
+  cout<<"Security: "<<context.securityLevel()<<endl;
+  cout<<"m: "<<m<<endl;
 
   FHESecKey secretKey(context);
   //construct secret Key
