@@ -44,8 +44,8 @@ vector<int> mergeOR(const vector<vector<int>> &index, const vector<int> &id){
     return index[id[0]];
   }
 
-  id_l = vector<int>(id.begin(), id.begin()+len/2);
-  id_r = vector<int>(id.begin()+len/2, id.end());
+  const vector<int> id_l = vector<int>(id.begin(), id.begin()+len/2);
+  const vector<int> id_r = vector<int>(id.begin()+len/2, id.end());
 
   const vector<int> res_l = mergeOR(index, id_l);
   const vector<int> res_r = mergeOR(index, id_r);
@@ -104,7 +104,7 @@ int main (int argc, char *argv[]){
   // obtain a seed from the system clock
   std::mt19937 generator(seed);
 
-  ifsteram fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+  ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
   bool dbstatus;
   assert(fdbbasics>>dbstatus);
   assert(dbstatus);
@@ -221,7 +221,7 @@ int main (int argc, char *argv[]){
       ea.encrypt(allzero500, publicKey, allzero500_long);
       for (int i=0;i<numRes;i+=500, ++numchunks){
         int end=min(i+500, numRes);
-        vector<int> chunk(filteredres.begin()+i, fiteredres.begin()+end);
+        vector<int> chunk(filteredres.begin()+i, filteredres.begin()+end);
         chunks.push_back(chunk);
         chunk_res.push_back(allzero500);
       }
@@ -247,7 +247,8 @@ int main (int argc, char *argv[]){
 
           vector<Ctxt> rangemul;
           for (int diff=-5;diff<=5;++diff){
-            Ctxt diffed(publicKey)=chunk_res[i];
+            Ctxt diffed(publicKey);
+            diffed=chunk_res[i];
             diffed.addConstant(to_ZZX(diff));
             rangemul.push_back(diffed);
           }
@@ -279,7 +280,7 @@ int main (int argc, char *argv[]){
       vector<pair<int,int>> choice_list;
 
       client>>numchoice;
-      for (int i=0;i<numchoice;++i){
+      for (int k=0;k<numchoice;++k){
         int i,j;
         client>>i>>j;
         if (j<chunks[i].size()) choice_list.push_back(make_pair(i,j));

@@ -1,6 +1,9 @@
 #include<iostream>
+#include<fstream>
 #include<vector>
 #include<algorithm>
+#include<string>
+#include<cassert>
 using namespace std;
 
 // This file update invertedindex
@@ -11,7 +14,7 @@ int main (int argc, char *argv[]){
   assert(argc>5);
   // Must contains at least 5 parameters
 
-  ifsteram fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+  ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
   bool dbstatus;
   assert(fdbbasics>>dbstatus);
   assert(dbstatus);
@@ -27,7 +30,6 @@ int main (int argc, char *argv[]){
     ftest.close();
   }
   catch(const exception& e){
-    cerr<<"Error "<<e<<endl;
     cerr<<"Seems problems within the filename or the file itself."<<endl;
     cerr<<"DB not updated."<<endl;
     return 1;
@@ -57,7 +59,7 @@ int main (int argc, char *argv[]){
     if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
   }
 
-  string copy_str="mv "+filename+" ../encdata/"+to_str(numRec)+".bin";
+  string copy_str="mv "+filename+" ../encdata/"+to_string(numRec)+".bin";
   system(copy_str.c_str());
 
   string auxfilename="../auxdata/"+to_string(numRec)+".bin";
@@ -81,9 +83,9 @@ int main (int argc, char *argv[]){
   vector<vector<int>> medIndex;
   vector<vector<int>> sideIndex;
   ifstream findexmed ("../auxdata/med.inv", std::ios::binary);
-  int numMed;
-  findexmed>>numMed;
-  for (int i=0;i<numMed;++i){
+  int numMedDict;
+  findexmed>>numMedDict;
+  for (int i=0;i<numMedDict;++i){
     int numindex;
     findexmed>>numindex;
     vector<int> tempindex;
@@ -97,9 +99,9 @@ int main (int argc, char *argv[]){
   findexmed.close();
 
   ifstream findexside ("../auxdata/side.inv", std::ios::binary);
-  int numSide;
-  findexside>>numSide;
-  for (int i=0;i<numSide;++i){
+  int numSideDict;
+  findexside>>numSideDict;
+  for (int i=0;i<numSideDict;++i){
     int numindex;
     findexside>>numindex;
     vector<int> tempindex;

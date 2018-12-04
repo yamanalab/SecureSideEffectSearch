@@ -22,7 +22,7 @@ using namespace std;
 
 int main (int argc, char *argv[]){
 
-  ifsteram fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+  ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
   bool dbstatus;
   assert(fdbbasics>>dbstatus);
   assert(dbstatus);
@@ -44,6 +44,12 @@ int main (int argc, char *argv[]){
   ZZX G=context.alMod.getFactorsOverZZ()[0];
   EncryptedArray ea(context, G);
   //generate ea from context
+
+  FHESecKey secretKey(context);
+  ifstream fskey("../settings/sk.bin", std::ios::binary);
+  assert(fskey>>secretKey);
+  fskey.close();
+  //read secretKey from sk.bin
 
   FHEPubKey publicKey(context);
   ifstream fpkey("../settings/pk.bin", std::ios::binary);
@@ -73,7 +79,7 @@ int main (int argc, char *argv[]){
   assert(gender=='m'||gender=='f');
   int mask=age+(gender=='m'?1:0)*128+5;
   Ctxt enc_mask(publicKey);
-  publicKey.encrypt(enc_mask, to_ZZX(mask));
+  publicKey.Encrypt(enc_mask, to_ZZX(mask));
   cout<<"Age and gender information successfully encrypted."<<endl;
   cout<<"Enter number of medicine (>0): ";
   int numMed;
@@ -127,15 +133,15 @@ int main (int argc, char *argv[]){
   connect.flush();
 
   int numRes;
-  client>>numRes;
+  connect>>numRes;
   vector<int> records;
   for (int i=0;i<numRes;++i){
     int recID;
-    client>>recID;
+    connect>>recID;
     records.push_back(recID);
   }
   unsigned exec_time;
-  client>>exec_time;
+  connect>>exec_time;
   cout<<"Server has completed running in "<<exec_time<<" seconds."<<endl;
   cout<<"Result list:"<<endl;
   for (int i=0;i<numRes;++i) cout<<records[i]<<endl;
