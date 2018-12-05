@@ -14,14 +14,16 @@ using namespace std;
 
 int main (void){
 
-  long m = 16384 , p = 257 , r = 1;
-  long L = 7;
+  long m = 32768 , p = 257 , r = 1;
+  long L = 9;
   long c = 3;
   long w = 64;
   long d = 0;
   long security = 128;
   ZZX G;
   //m=FindM(security,L,c,p,d,0,0);
+
+  // p=2, r=8, L=7, m = 8191, #slot =630, sec=144.677
 
   FHEcontext context(m, p, r);
   //initialize FHEcontext

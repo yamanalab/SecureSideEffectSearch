@@ -221,17 +221,19 @@ int main (int argc, char *argv[]){
       vector<long> allzero_long(nslots, 0);
       Ctxt allzero(publicKey);
       ea.encrypt(allzero, publicKey, allzero_long);
-      for (int i=0;i<numRes;i+=500, ++numchunks){
-        int end=min(i+500, numRes);
+      for (int i=0;i<numRes;i+=100, ++numchunks){
+        int end=min(i+100, numRes);
         vector<int> chunk(filteredres.begin()+i, filteredres.begin()+end);
         chunks.push_back(chunk);
         chunk_res.push_back(allzero);
       }
-      cout<<nslots<<endl;
+      //cout<<nslots<<endl;
 
       NTL_EXEC_RANGE(numchunks, first, last)
 
         for (long i=first;i<last;++i){
+
+          cout<<" Lvl --> Before addition: "<<chunk_res[i].findBaseLevel()<<endl;
 
           for (int j=0;j<chunks[i].size();++j){
             vector<long> posindicator_long=allzero_long;
@@ -243,11 +245,13 @@ int main (int argc, char *argv[]){
             Ctxt encmask(publicKey);
             assert(fdb>>encmask);
             fdb.close();
-            cout<<"Done extraction of encrypted mask for file #"<<j<<endl;
+            //cout<<"Done extraction of encrypted mask for file #"<<j<<endl;
             encmask.multByConstant(posindicator);
             chunk_res[i].addCtxt(encmask, false);
             // false means not minus
           }
+
+          cout<<" Lvl --> After addition: "<<chunk_res[i].findBaseLevel()<<endl;
 
           chunk_res[i].addCtxt(query_mask, true);
 
@@ -259,7 +263,10 @@ int main (int argc, char *argv[]){
             rangemul.push_back(diffed);
           }
 
+          cout<<" Lvl --> After ranging: "<<rangemul[0].findBaseLevel()<<endl;
+
           while (rangemul.size()>1){
+            cout<<" Lvl --> current rangemul size: "<<rangemul.size()<<" level: "<<rangemul[0].findBaseLevel()<<endl;
             vector<Ctxt> rangemul_derived;
             for (int j=0;j<rangemul.size();j+=2){
               if (j+1<rangemul.size()) rangemul[j].multiplyBy(rangemul[j+1]);
@@ -271,6 +278,8 @@ int main (int argc, char *argv[]){
 
           chunk_res[i]=rangemul[0];
           chunk_res[i].multByConstant(to_ZZX(generator()%256+1));
+
+          cout<<" Lvl --> After randomize: "<<chunk_res[i].findBaseLevel()<<endl;
 
         }
 

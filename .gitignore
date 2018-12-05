@@ -8,3 +8,6 @@ src/*
 
 # Encrypted data
 *.bin
+
+# Inverted index
+*.inv
