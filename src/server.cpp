@@ -125,6 +125,7 @@ int main (int argc, char *argv[]){
 
   ZZX G=context.alMod.getFactorsOverZZ()[0];
   EncryptedArray ea(context, G);
+  long nslots=ea.size();
   //generate ea from context
 
   FHEPubKey publicKey(context);
@@ -198,6 +199,7 @@ int main (int argc, char *argv[]){
         client>>sideid;
         SideID.push_back(sideid);
       }
+      cout<<"completed input"<<endl;
 
       //complete input
 
@@ -216,22 +218,23 @@ int main (int argc, char *argv[]){
       int numRes=filteredres.size(), numchunks;
       vector<vector<int>> chunks;
       vector<Ctxt> chunk_res;
-      vector<long> allzero500_long(500, 0);
-      Ctxt allzero500(publicKey);
-      ea.encrypt(allzero500, publicKey, allzero500_long);
+      vector<long> allzero_long(nslots, 0);
+      Ctxt allzero(publicKey);
+      ea.encrypt(allzero, publicKey, allzero_long);
       for (int i=0;i<numRes;i+=500, ++numchunks){
         int end=min(i+500, numRes);
         vector<int> chunk(filteredres.begin()+i, filteredres.begin()+end);
         chunks.push_back(chunk);
-        chunk_res.push_back(allzero500);
+        chunk_res.push_back(allzero);
       }
+      cout<<nslots<<endl;
 
       NTL_EXEC_RANGE(numchunks, first, last)
 
         for (long i=first;i<last;++i){
 
           for (int j=0;j<chunks[i].size();++j){
-            vector<long> posindicator_long=allzero500_long;
+            vector<long> posindicator_long=allzero_long;
             posindicator_long[j]=1;
             ZZX posindicator;
             ea.encode(posindicator, posindicator_long);
@@ -240,10 +243,13 @@ int main (int argc, char *argv[]){
             Ctxt encmask(publicKey);
             assert(fdb>>encmask);
             fdb.close();
+            cout<<"Done extraction of encrypted mask for file #"<<j<<endl;
             encmask.multByConstant(posindicator);
             chunk_res[i].addCtxt(encmask, false);
             // false means not minus
           }
+
+          chunk_res[i].addCtxt(query_mask, true);
 
           vector<Ctxt> rangemul;
           for (int diff=-5;diff<=5;++diff){
@@ -286,6 +292,8 @@ int main (int argc, char *argv[]){
         if (j<chunks[i].size()) choice_list.push_back(make_pair(i,j));
       }
       unsigned end_timer = std::chrono::system_clock::now().time_since_epoch().count();
+
+      cout<<"Complete dealing"<<endl;
       //complete dealing
 
       numchoice=choice_list.size();

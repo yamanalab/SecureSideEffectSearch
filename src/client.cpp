@@ -89,6 +89,7 @@ int main (int argc, char *argv[]){
   vector<int> meds;
   for (int i=0;i<numMed;++i){
     int medID;
+    cin>>medID;
     assert(medID<totMed);
     if (find(meds.begin(),meds.end(),medID)==meds.end()) meds.push_back(medID);
   }
@@ -100,9 +101,13 @@ int main (int argc, char *argv[]){
   vector<int> sides;
   for (int i=0;i<numSide;++i){
     int sideID;
+    cin>>sideID;
     assert(sideID<totSide);
     if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
   }
+
+  connect<<enc_mask;
+  connect.flush();
 
   connect<<meds.size()<<endl;
   for (int i=0;i<meds.size();++i) connect<<meds[i]<<endl;

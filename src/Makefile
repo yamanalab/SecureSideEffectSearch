@@ -20,4 +20,7 @@ update: update.cpp
 	$(CC) $(INCLUDES) -o update update.cpp $(HELIBDIR) $(CFLAGS)
 
 data_enc: data_enc.cpp
-	$(CC) $(INCLUDES) -o data_enc data_enc.cpp $(HELIBDIR) $(CFLAGS)	
+	$(CC) $(INCLUDES) -o data_enc data_enc.cpp $(HELIBDIR) $(CFLAGS)
+
+findm: findm.cpp
+	$(CC) $(INCLUDES) -o findm findm.cpp $(HELIBDIR) $(CFLAGS)	

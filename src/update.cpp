@@ -12,6 +12,7 @@ using namespace std;
 int main (int argc, char *argv[]){
 
   assert(argc>5);
+  cout<<"argc: "<<argc<<endl;
   // Must contains at least 5 parameters
 
   ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
@@ -37,9 +38,10 @@ int main (int argc, char *argv[]){
 
   const string numMed_str(argv[2]);
   const int numMed=stoi(numMed_str);
+  cout<<"numMed: "<<numMed<<endl;
 
   vector<int> meds;
-  assert(argc>4+numMed);
+  assert(argc>=5+numMed);
   for (int i=0;i<numMed;++i){
     const string medID_str(argv[3+i]);
     const int medID=stoi(medID_str);
@@ -47,11 +49,12 @@ int main (int argc, char *argv[]){
     if (find(meds.begin(),meds.end(),medID)==meds.end()) meds.push_back(medID);
   }
 
-  const string numSide_str(argv[2+numMed]);
+  const string numSide_str(argv[3+numMed]);
   const int numSide=stoi(numSide_str);
+  cout<<"numSide: "<<numSide<<endl;
 
   vector<int> sides;
-  assert(argc==3+numMed+numSide);
+  assert(argc==4+numMed+numSide);
   for(int i=0;i<numSide;++i){
     const string sideID_str(argv[4+numMed+i]);
     const int sideID=stoi(sideID_str);
@@ -60,6 +63,7 @@ int main (int argc, char *argv[]){
   }
 
   string copy_str="mv "+filename+" ../encdata/"+to_string(numRec)+".bin";
+  cout<<"Calling: "<<copy_str<<endl;
   system(copy_str.c_str());
 
   string auxfilename="../auxdata/"+to_string(numRec)+".bin";
@@ -116,22 +120,23 @@ int main (int argc, char *argv[]){
 
   for (int i=0;i<numMed;++i) medIndex[meds[i]].push_back(numRec);
   for (int i=0;i<numSide;++i) sideIndex[sides[i]].push_back(numRec);
+  cout<<"Updated rev index"<<endl;
 
   ofstream findexmedw ("../auxdata/med.inv", std::ios::binary);
-  findexmedw<<numMed<<endl;
-  for (int i=0;i<numMed;++i){
+  findexmedw<<numMedDict<<endl;
+  for (int i=0;i<numMedDict;++i){
     findexmedw<<medIndex[i].size()<<endl;
     for (int j=0;j<medIndex[i].size();++j) findexmedw<<medIndex[i][j]<<endl;
   }
   findexmedw.close();
 
   ofstream findexsidew ("../auxdata/side.inv", std::ios::binary);
-  findexsidew<<numSide<<endl;
-  for (int i=0;i<numSide;++i){
+  findexsidew<<numSideDict<<endl;
+  for (int i=0;i<numSideDict;++i){
     findexsidew<<sideIndex[i].size()<<endl;
     for (int j=0;j<sideIndex[i].size();++j) findexsidew<<sideIndex[i][j]<<endl;
   }
-  findexmedw.close();
+  findexsidew.close();
 
   cout<<"New record as: #"<<numRec<<endl;
   cout<<"DB successfully updated."<<endl;
