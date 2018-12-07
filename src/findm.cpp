@@ -22,8 +22,8 @@ int main()
 	long p = 2;
   long r = 8;
 	long min_slot = 500; // minimum # slots
-  long L = 7;         // # levels for a certain task
-	long first_m = 2000;// technical artifact of the analysis
+  long L = 9;         // # levels for a certain task
+	long first_m = 15000;// technical artifact of the analysis
 	long last_m = 50000; // m ranges in [first_m, last_m]
 
 	ofstream ofs("good_params_for_L" + std::to_string(L));
@@ -31,7 +31,7 @@ int main()
 
 	cout << "Finding good params ..." << endl;
 
-	int threads=16;
+	int threads=72;
 
 	NTL_EXEC_RANGE(threads, first, last)
 		for (int i=first;i<last;++i){
