@@ -4,6 +4,9 @@
 #include <NTL/BasicThreadPool.h>
 #include "FHE.h"
 #include "timing.h"
+#include <ctime>
+#include <sstream>
+#include <iomanip>
 #include "EncryptedArray.h"
 #include <NTL/lzz_pXFactoring.h>
 #include <cassert>
@@ -27,6 +30,15 @@ using namespace std;
 //
 // Don't comment on my coding style
 // It looks ugly, I know.
+
+string return_current_time_and_date(){
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+    stringstream ss;
+    ss << put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+    return ss.str();
+}
 
 vector<vector<int>> medIndex;
 vector<vector<int>> sideIndex;
@@ -181,7 +193,7 @@ int main (int argc, char *argv[]){
     boost::system::error_code err;
     acceptor.accept(*client.rdbuf(), err);
     if (!err){
-      cout<<"connected"<<endl;
+      cout<<return_current_time_and_date()<<" connected"<<endl;
       Ctxt query_mask(publicKey);
       client>>query_mask;
       int nMed,nSide;
@@ -199,11 +211,11 @@ int main (int argc, char *argv[]){
         client>>sideid;
         SideID.push_back(sideid);
       }
-      cout<<"completed input"<<endl;
+      cout<<return_current_time_and_date()<<" completed input"<<endl;
 
       //complete input
 
-      unsigned start_timer = std::chrono::system_clock::now().time_since_epoch().count();
+      auto start_timer = std::chrono::system_clock::now();
 
       /*
       Dealing part consist of three parts:
@@ -233,7 +245,7 @@ int main (int argc, char *argv[]){
 
         for (long i=first;i<last;++i){
 
-          cout<<" Lvl --> Before addition: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> Before addition: "<<chunk_res[i].findBaseLevel()<<endl;
 
           for (int j=0;j<chunks[i].size();++j){
             vector<long> posindicator_long=allzero_long;
@@ -251,7 +263,7 @@ int main (int argc, char *argv[]){
             // false means not minus
           }
 
-          cout<<" Lvl --> After addition: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After addition: "<<chunk_res[i].findBaseLevel()<<endl;
 
           chunk_res[i].addCtxt(query_mask, true);
 
@@ -263,10 +275,10 @@ int main (int argc, char *argv[]){
             rangemul.push_back(diffed);
           }
 
-          cout<<" Lvl --> After ranging: "<<rangemul[0].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After ranging: "<<rangemul[0].findBaseLevel()<<endl;
 
           while (rangemul.size()>1){
-            cout<<" Lvl --> current rangemul size: "<<rangemul.size()<<" level: "<<rangemul[0].findBaseLevel()<<endl;
+            //cout<<" Lvl --> current rangemul size: "<<rangemul.size()<<" level: "<<rangemul[0].findBaseLevel()<<endl;
             vector<Ctxt> rangemul_derived;
             for (int j=0;j<rangemul.size();j+=2){
               if (j+1<rangemul.size()) rangemul[j].multiplyBy(rangemul[j+1]);
@@ -279,7 +291,7 @@ int main (int argc, char *argv[]){
           chunk_res[i]=rangemul[0];
           chunk_res[i].multByConstant(to_ZZX(generator()%256+1));
 
-          cout<<" Lvl --> After randomize: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After randomize: "<<chunk_res[i].findBaseLevel()<<endl;
 
         }
 
@@ -300,20 +312,22 @@ int main (int argc, char *argv[]){
         client>>i>>j;
         if (j<chunks[i].size()) choice_list.push_back(make_pair(i,j));
       }
-      unsigned end_timer = std::chrono::system_clock::now().time_since_epoch().count();
+      auto end_timer = std::chrono::system_clock::now();
+      std::chrono::duration<double> diff = end_timer-start_timer;
 
-      cout<<"Complete dealing"<<endl;
+      cout<<return_current_time_and_date()<<" Complete dealing"<<endl;
       //complete dealing
 
       numchoice=choice_list.size();
       client<<numchoice<<endl;
       for (int i=0;i<numchoice;++i) client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
-      client<<end_timer-start_timer<<endl;
+      client<<diff.count()<<endl;
       //complete output
 
       client.close();
+      break;
     }
-    else cerr<<"Error: "<<err<<endl;
+    else cerr<<return_current_time_and_date()<<" Error: "<<err<<endl;
   }
 
   return 0;

@@ -8,6 +8,9 @@
 #include <NTL/lzz_pXFactoring.h>
 #include <cassert>
 #include <cstdio>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
 #include <thread>
 #include <chrono>
 #include <random>
@@ -19,6 +22,15 @@ using namespace std;
 // Client holds secret key and public key
 //
 // Usage: client [IP/DOMAIN] [PORT]
+
+string return_current_time_and_date(){
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+    stringstream ss;
+    ss << put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+    return ss.str();
+}
 
 int main (int argc, char *argv[]){
 
@@ -64,11 +76,11 @@ int main (int argc, char *argv[]){
   using boost::asio::ip::tcp;
   tcp::iostream connect(ip_address.c_str(), port.c_str());
   if (!connect){
-    cerr<<"Can not connect: "<<connect.error().message()<<endl;
+    cerr<<return_current_time_and_date()<<" Can not connect: "<<connect.error().message()<<endl;
     return 1;
   }
 
-  cout<<"Successfully created connection with "<<ip_address<<":"<<port<<endl;
+  cout<<return_current_time_and_date()<<" Successfully created connection with "<<ip_address<<":"<<port<<endl;
   cout<<"Enter age:(0-122)";
   int age;
   cin>>age;
@@ -105,6 +117,7 @@ int main (int argc, char *argv[]){
     assert(sideID<totSide);
     if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
   }
+  auto start_timer = std::chrono::system_clock::now();
 
   connect<<enc_mask;
   connect.flush();
@@ -145,12 +158,16 @@ int main (int argc, char *argv[]){
     connect>>recID;
     records.push_back(recID);
   }
-  unsigned exec_time;
+  double exec_time;
   connect>>exec_time;
+  auto end_timer = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_timer-start_timer;
   cout<<"Server has completed running in "<<exec_time<<" seconds."<<endl;
   cout<<"Result list:"<<endl;
   for (int i=0;i<numRes;++i) cout<<records[i]<<endl;
   cout<<"Total record number hit: "<<numRes<<endl;
+  cout<<"The whole session has used "<<diff.count()<<" seconds."<<endl;
+  cout<<return_current_time_and_date()<<" Session with server is over."<<endl;
 
   return 0;
 }

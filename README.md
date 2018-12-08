@@ -53,7 +53,7 @@ God Side
 2. Generate FHE context and keys.
 
 - data_enc.cpp
-1. Usage `data_enc`
+1. Usage: `data_enc`
 2. How does it work?
     1. From the generated dummy data, initialize the inverted index `med.inv` and `side.inv`.
     2. Call `update` for each plaintext record with encrypted [mask].
