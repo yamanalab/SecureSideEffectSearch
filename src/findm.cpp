@@ -23,7 +23,7 @@ int main()
   long r = 8;
 	long min_slot = 500; // minimum # slots
   long L = 9;         // # levels for a certain task
-	long first_m = 15000;// technical artifact of the analysis
+	long first_m = 10000;// technical artifact of the analysis
 	long last_m = 50000; // m ranges in [first_m, last_m]
 
 	ofstream ofs("good_params_for_L" + std::to_string(L));

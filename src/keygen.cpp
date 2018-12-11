@@ -28,14 +28,23 @@ int main (void){
   //m=FindM(security,L,c,p,d,0,0);
 
   // p=2, r=8, L=7, m = 8191, #slot =630, sec=144.677
+  // p=257, r=1, L=9, m=10363
+  /*
+  23311,23310,518,459.854
+  32377,32376,568,699.911
+  43691,43690,1285,951.033
+  */
 
   FHEcontext context(m, p, r);
   //initialize FHEcontext
   buildModChain(context, L, c);
   //modify the context, adding primes to the modulus buildModChain
 
+  long num_slot = context.zMStar.getNSlots();
+
   cout<<"Security: "<<context.securityLevel()<<endl;
   cout<<"m: "<<m<<endl;
+  cout<<"Nslots: "<<num_slot<<endl;
 
   FHESecKey secretKey(context);
   //construct secret Key
