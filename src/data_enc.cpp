@@ -20,7 +20,7 @@ using namespace std;
 
 const int Nmeds=2000;
 const int Nsides=100;
-const int Nrecs=200;
+const int Nrecs=40000;
 
 int main (void){
   ofstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);

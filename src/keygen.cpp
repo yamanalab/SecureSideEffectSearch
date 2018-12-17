@@ -16,7 +16,7 @@ int main (void){
 
   ifstream fin ("../settings/contextsetting.txt");
   long m,p,r,L,c,w,d,security;
-  fin>>m>>p>>r>>L>>c>>w>>d>>security;
+  fin>>p>>r>>L>>c>>w>>d>>security;
   fin.close();
 
   //long m = 32768 , p = 257 , r = 1;
@@ -25,7 +25,7 @@ int main (void){
   //long w = 64;
   //long d = 0;
   //long security = 128;
-  //m=FindM(security,L,c,p,d,0,0);
+  m=FindM(security,L,c,p,d,0,0);
 
   // p=2, r=8, L=7, m = 8191, #slot =630, sec=144.677
   // p=257, r=1, L=9, m=10363

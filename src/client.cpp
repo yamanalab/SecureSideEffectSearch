@@ -138,7 +138,10 @@ int main (int argc, char *argv[]){
     connect>>chunk_res;
     vector<long> decrypted;
     ea.decrypt(chunk_res, secretKey, decrypted);
-    for (int j=0;j<decrypted.size()&&j<500;++j)
+    cout<<"Chunk #"<<i<<endl;
+    for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+    cout<<endl;
+    for (int j=0;j<decrypted.size();++j)
       if (decrypted[j]==0) ret.push_back(make_pair(i,j));
   }
 

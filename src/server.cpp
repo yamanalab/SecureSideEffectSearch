@@ -18,6 +18,9 @@
 #include <boost/asio/ip/tcp.hpp>
 using namespace std;
 
+//#define __DEBUG__
+#define __MULTITHREADING_IN_USE__
+
 // Server only have sk
 // Receive query from client
 //
@@ -181,6 +184,10 @@ int main (int argc, char *argv[]){
   //read invertedindex for side effects from side.inv
 
   assert(argc==2);
+  const vector<long> allzero_long(nslots, 0);
+  Ctxt allzero(publicKey);
+  ea.encrypt(allzero, publicKey, allzero_long);
+
   string port_str(argv[1]);
   int port=stoi(port_str);
 
@@ -226,13 +233,11 @@ int main (int argc, char *argv[]){
       */
 
       vector<int> filteredres=merge(MedID, SideID);
+      cout<<return_current_time_and_date()<<" completed filtering."<<endl;
 
-      int numRes=filteredres.size(), numchunks;
+      int numRes=filteredres.size(), numchunks=0;
       vector<vector<int>> chunks;
       vector<Ctxt> chunk_res;
-      vector<long> allzero_long(nslots, 0);
-      Ctxt allzero(publicKey);
-      ea.encrypt(allzero, publicKey, allzero_long);
       for (int i=0;i<numRes;i+=100, ++numchunks){
         int end=min(i+100, numRes);
         vector<int> chunk(filteredres.begin()+i, filteredres.begin()+end);
@@ -241,7 +246,23 @@ int main (int argc, char *argv[]){
       }
       //cout<<nslots<<endl;
 
+      cout<<return_current_time_and_date()<<" completed chunk splitting."<<endl;
+      /*
+      " numRes: "<<numRes<<" numChunks: "<<numchunks<<endl;
+
+      for (int i=0;i<numchunks;++i){
+        cout<<"Chunk #"<<i<<endl;
+        for (int j=0;j<chunks[i].size();++j) cout<<chunks[i][j]<<" ";
+        cout<<endl;
+      }
+      */
+
+#ifndef __MULTITHREADING_IN_USE__
+      long first=0, last=numchunks;
+#else
+      cout<<return_current_time_and_date()<<" start with multithreading in use."<<endl;
       NTL_EXEC_RANGE(numchunks, first, last)
+#endif
 
         for (long i=first;i<last;++i){
 
@@ -264,8 +285,33 @@ int main (int argc, char *argv[]){
           }
 
           //cout<<" Lvl --> After addition: "<<chunk_res[i].findBaseLevel()<<endl;
+          #ifdef __DEBUG__
+          FHESecKey secretKey(context);
+          ifstream fskey("../settings/sk.bin", std::ios::binary);
+          assert(fskey>>secretKey);
+          fskey.close();
+          //read secretKey from sk.bin
+          cout<<"Chunk #"<<i<<endl;
+          cout<<"Before summing up"<<endl;
+          {
+            vector<long> decrypted;
+            ea.decrypt(chunk_res[i], secretKey, decrypted);
+            for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+            cout<<endl;
+          }
+          #endif
 
           chunk_res[i].addCtxt(query_mask, true);
+
+          #ifdef __DEBUG__
+          cout<<"After summing up"<<endl;
+          {
+            vector<long> decrypted;
+            ea.decrypt(chunk_res[i], secretKey, decrypted);
+            for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+            cout<<endl;
+          }
+          #endif
 
           vector<Ctxt> rangemul;
           for (int diff=-5;diff<=5;++diff){
@@ -274,6 +320,19 @@ int main (int argc, char *argv[]){
             diffed.addConstant(to_ZZX(diff));
             rangemul.push_back(diffed);
           }
+
+          #ifdef __DEBUG__
+          cout<<"After rangemul"<<endl;
+          for (int k=0;k<11;++k){
+            vector<long> decrypted;
+            ea.decrypt(rangemul[k], secretKey, decrypted);
+            cout<<"rangemul #"<<k<<endl;
+            for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+            cout<<endl;
+          }
+          #endif
+
+
 
           //cout<<" Lvl --> After ranging: "<<rangemul[0].findBaseLevel()<<endl;
 
@@ -289,13 +348,43 @@ int main (int argc, char *argv[]){
           //11 -> 6 -> 3 -> 2 -> 1 , We need at least level of >6
 
           chunk_res[i]=rangemul[0];
-          chunk_res[i].multByConstant(to_ZZX(generator()%256+1));
+
+          #ifdef __DEBUG__
+          cout<<"After times up"<<endl;
+          {
+            vector<long> decrypted;
+            ea.decrypt(chunk_res[i], secretKey, decrypted);
+            for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+            cout<<endl;
+            cout<<"Level: "<<chunk_res[i].findBaseLevel()<<endl;
+          }
+          #endif
+
+          vector<long> randlist_long;
+          for (int i=0;i<nslots;++i) randlist_long.push_back(generator()%256+1);
+          ZZX randlist;
+          ea.encode(randlist, randlist_long);
+          chunk_res[i].multByConstant(randlist);
+
+          #ifdef __DEBUG__
+          {
+            cout<<"After randomize"<<endl;
+            vector<long> decrypted;
+            ea.decrypt(chunk_res[i], secretKey, decrypted);
+            for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
+            cout<<endl;
+            cout<<"Level: "<<chunk_res[i].findBaseLevel()<<endl;
+          }
+          #endif
+
 
           //cout<<" Lvl --> After randomize: "<<chunk_res[i].findBaseLevel()<<endl;
 
         }
 
+#ifdef __MULTITHREADING_IN_USE__
       NTL_EXEC_RANGE_END
+#endif
 
       client<<numchunks<<endl;
       for (int i=0;i<numchunks;++i){
@@ -325,7 +414,9 @@ int main (int argc, char *argv[]){
       //complete output
 
       client.close();
-      break;
+      chunks.clear();
+      chunk_res.clear();
+      //break;
     }
     else cerr<<return_current_time_and_date()<<" Error: "<<err<<endl;
   }
