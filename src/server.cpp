@@ -204,7 +204,7 @@ int main (int argc, char *argv[]){
     boost::system::error_code err;
     acceptor.accept(*client.rdbuf(), err);
     if (!err){
-      cout<<return_current_time_and_date()<<" connected"<<endl;
+      cout<<return_current_time_and_date()<<" Connected."<<endl;
       Ctxt query_mask(publicKey);
       client>>query_mask;
       int nMed,nSide;
@@ -222,7 +222,7 @@ int main (int argc, char *argv[]){
         client>>sideid;
         SideID.push_back(sideid);
       }
-      cout<<return_current_time_and_date()<<" completed input"<<endl;
+      cout<<return_current_time_and_date()<<" Completed input."<<endl;
 
       //complete input
 
@@ -237,7 +237,7 @@ int main (int argc, char *argv[]){
       */
 
       vector<int> filteredres=merge(MedID, SideID);
-      cout<<return_current_time_and_date()<<" completed filtering."<<endl;
+      cout<<return_current_time_and_date()<<" Completed filtering."<<endl;
 
       int numRes=filteredres.size(), numchunks=0;
       vector<vector<int>> chunks;
@@ -250,7 +250,7 @@ int main (int argc, char *argv[]){
       }
       //cout<<nslots<<endl;
 
-      cout<<return_current_time_and_date()<<" completed chunk splitting."<<endl;
+      cout<<return_current_time_and_date()<<" Completed chunk splitting."<<endl;
       /*
       " numRes: "<<numRes<<" numChunks: "<<numchunks<<endl;
 
@@ -264,7 +264,7 @@ int main (int argc, char *argv[]){
 #ifndef __MULTITHREADING_IN_USE__
       long first=0, last=numchunks;
 #else
-      cout<<return_current_time_and_date()<<" start with multithreading in use."<<endl;
+      cout<<return_current_time_and_date()<<" Start with multithreading in use."<<endl;
       NTL_EXEC_RANGE(numchunks, first, last)
 #endif
 
@@ -390,6 +390,8 @@ int main (int argc, char *argv[]){
       NTL_EXEC_RANGE_END
 #endif
 
+      cout<<return_current_time_and_date()<<" Complete calculation."<<endl;
+
       auto start_comm_timer = std::chrono::system_clock::now();
 
       client<<numchunks<<endl;
@@ -397,6 +399,8 @@ int main (int argc, char *argv[]){
         client<<chunk_res[i];
         client.flush();
       }
+
+      cout<<return_current_time_and_date()<<" Complete output to client."<<endl;
 
       int numchoice;
       vector<pair<int,int>> choice_list;
@@ -411,9 +415,9 @@ int main (int argc, char *argv[]){
       std::chrono::duration<double> time_servercalc = start_comm_timer-start_timer;
       std::chrono::duration<double> time_servercomm = end_timer-start_comm_timer;
 
-      cout<<return_current_time_and_date()<<" Complete dealing"<<endl;
-      cout<<return_current_time_and_date()<<" Time spent for server to do calculation is "<<time_servercalc.count()<<endl;
-      cout<<return_current_time_and_date()<<" Time spent on communication from server's POV is "<<time_servercomm.count()<<endl;
+      cout<<return_current_time_and_date()<<" Complete dealing."<<endl;
+      cout<<return_current_time_and_date()<<" Time spent for server to do calculation is "<<time_servercalc.count()<<" seconds."<<endl;
+      cout<<return_current_time_and_date()<<" Time spent on communication from server's POV is "<<time_servercomm.count()<<" seconds."<<endl;
       //complete dealing
 
       numchoice=choice_list.size();
