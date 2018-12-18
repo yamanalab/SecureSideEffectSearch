@@ -172,11 +172,17 @@ int main (int argc, char *argv[]){
   std::chrono::duration<double> diff = end_timer-start_timer;
   cout<<"Server has completed running in "<<exec_time<<" seconds."<<endl;
   cout<<"Communication spent "<<comm_time<<" seconds from server's POV and decryption spent "<<diff_dec.count()<<" seconds from client's POV."<<endl;
-  cout<<"Result list:"<<endl;
-  for (int i=0;i<numRes;++i) cout<<records[i]<<endl;
   cout<<"Total record number hit: "<<numRes<<endl;
   cout<<"The whole session has used "<<diff.count()<<" seconds."<<endl;
   cout<<return_current_time_and_date()<<" Session with server is over."<<endl;
+
+  cout<<"Show result list?(y/n)";
+  char c;
+  cin>>c;
+  if (c=='Y'||c=='y'){
+    cout<<"Result list:"<<endl;
+    for (int i=0;i<numRes;++i) cout<<records[i]<<endl;
+  }
 
   return 0;
 }
