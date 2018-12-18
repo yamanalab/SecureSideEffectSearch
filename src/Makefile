@@ -1,7 +1,7 @@
 
 CC = g++
 INCLUDES =  -I/home/ameki/github/HElib/src
-CFLAGS = -O2 -std=c++11 -lm -pthread -lntl -lgmp -lboost_system
+CFLAGS = -O2 -std=c++11 -lm -pthread -DFHE_THREADS -DFHE_DCRT_THREADS -DFHE_BOOT_THREADS -lntl -lgmp -lboost_system
 HELIBDIR = /home/ameki/github/HElib/src/fhe.a
 
 
@@ -23,4 +23,4 @@ data_enc: data_enc.cpp
 	$(CC) $(INCLUDES) -o data_enc data_enc.cpp $(HELIBDIR) $(CFLAGS)
 
 findm: findm.cpp
-	$(CC) $(INCLUDES) -o findm findm.cpp $(HELIBDIR) $(CFLAGS)	
+	$(CC) $(INCLUDES) -o findm findm.cpp $(HELIBDIR) $(CFLAGS)

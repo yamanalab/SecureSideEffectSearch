@@ -132,18 +132,23 @@ int main (int argc, char *argv[]){
 
   int numChunks;
   connect>>numChunks;
+  auto dec_timer = std::chrono::system_clock::now();
   vector<pair<int,int>> ret;
   for (int i=0;i<numChunks;++i){
     Ctxt chunk_res(publicKey);
     connect>>chunk_res;
     vector<long> decrypted;
     ea.decrypt(chunk_res, secretKey, decrypted);
+    /*
     cout<<"Chunk #"<<i<<endl;
     for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
     cout<<endl;
+    */
     for (int j=0;j<decrypted.size();++j)
       if (decrypted[j]==0) ret.push_back(make_pair(i,j));
   }
+  auto dec_end_timer = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff_dec = dec_end_timer - dec_timer;
 
   connect<<ret.size()<<endl;
   for (pair<int,int> ret_item: ret){
@@ -161,11 +166,12 @@ int main (int argc, char *argv[]){
     connect>>recID;
     records.push_back(recID);
   }
-  double exec_time;
-  connect>>exec_time;
+  double exec_time, comm_time;
+  connect>>exec_time>>comm_time;
   auto end_timer = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_timer-start_timer;
   cout<<"Server has completed running in "<<exec_time<<" seconds."<<endl;
+  cout<<"Communication spent "<<comm_time<<" seconds from server's POV and decryption spent "<<diff_dec.count()<<" seconds from client's POV."<<endl;
   cout<<"Result list:"<<endl;
   for (int i=0;i<numRes;++i) cout<<records[i]<<endl;
   cout<<"Total record number hit: "<<numRes<<endl;

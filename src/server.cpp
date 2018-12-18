@@ -21,6 +21,8 @@ using namespace std;
 //#define __DEBUG__
 #define __MULTITHREADING_IN_USE__
 
+const int NThreads = 28;
+
 // Server only have sk
 // Receive query from client
 //
@@ -114,6 +116,8 @@ vector<int> merge(const vector<int> &medID, const vector<int> &sideID){
 }
 
 int main (int argc, char *argv[]){
+
+  SetNumThreads(NThreads);
 
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   // obtain a seed from the system clock
@@ -386,6 +390,8 @@ int main (int argc, char *argv[]){
       NTL_EXEC_RANGE_END
 #endif
 
+      auto start_comm_timer = std::chrono::system_clock::now();
+
       client<<numchunks<<endl;
       for (int i=0;i<numchunks;++i){
         client<<chunk_res[i];
@@ -402,15 +408,19 @@ int main (int argc, char *argv[]){
         if (j<chunks[i].size()) choice_list.push_back(make_pair(i,j));
       }
       auto end_timer = std::chrono::system_clock::now();
-      std::chrono::duration<double> diff = end_timer-start_timer;
+      std::chrono::duration<double> time_servercalc = start_comm_timer-start_timer;
+      std::chrono::duration<double> time_servercomm = end_timer-start_comm_timer;
 
       cout<<return_current_time_and_date()<<" Complete dealing"<<endl;
+      cout<<return_current_time_and_date()<<" Time spent for server to do calculation is "<<time_servercalc.count()<<endl;
+      cout<<return_current_time_and_date()<<" Time spent on communication from server's POV is "<<time_servercomm.count()<<endl;
       //complete dealing
 
       numchoice=choice_list.size();
       client<<numchoice<<endl;
       for (int i=0;i<numchoice;++i) client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
-      client<<diff.count()<<endl;
+      client<<time_servercalc.count()<<endl;
+      client<<time_servercomm.count()<<endl;
       //complete output
 
       client.close();
