@@ -237,9 +237,10 @@ int main (int argc, char *argv[]){
       */
 
       vector<int> filteredres=merge(MedID, SideID);
-      cout<<return_current_time_and_date()<<" Completed filtering."<<endl;
 
       int numRes=filteredres.size(), numchunks=0;
+      double percentage=100.0*(double)numRes/(double)numRec;
+      cout<<return_current_time_and_date()<<" Completed filtering, with efficiency of "<<percentage<<"%."<<endl;
       vector<vector<int>> chunks;
       vector<Ctxt> chunk_res;
       for (int i=0;i<numRes;i+=100, ++numchunks){
