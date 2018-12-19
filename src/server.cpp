@@ -426,6 +426,7 @@ int main (int argc, char *argv[]){
       for (int i=0;i<numchoice;++i) client<<chunks[choice_list[i].first][choice_list[i].second]<<endl;
       client<<time_servercalc.count()<<endl;
       client<<time_servercomm.count()<<endl;
+      client<<percentage<<endl;
       //complete output
 
       client.close();

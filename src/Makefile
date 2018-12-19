@@ -1,8 +1,8 @@
 
 CC = g++
-INCLUDES =  -I/home/ameki/github/HElib/src
+INCLUDES =  -I/usr/local/src/HElib/src
 CFLAGS = -O2 -std=c++11 -lm -pthread -DFHE_THREADS -DFHE_DCRT_THREADS -DFHE_BOOT_THREADS -lntl -lgmp -lboost_system
-HELIBDIR = /home/ameki/github/HElib/src/fhe.a
+HELIBDIR = /usr/local/src/HElib/src/fhe.a
 
 
 #g++ -I/home/ameki/github/HElib/src keygen.cpp /home/ameki/github/HElib/src/fhe.a -o keygen -lntl -lgmp -lm -pthread
@@ -24,3 +24,6 @@ data_enc: data_enc.cpp
 
 findm: findm.cpp
 	$(CC) $(INCLUDES) -o findm findm.cpp $(HELIBDIR) $(CFLAGS)
+
+client_datacollect: client_datacollect.cpp
+	$(CC) $(INCLUDES) -o client_datacollect client_datacollect.cpp $(HELIBDIR) $(CFLAGS)
