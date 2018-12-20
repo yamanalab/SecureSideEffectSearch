@@ -74,8 +74,8 @@ vector<int> mergeOR(const vector<vector<int>> &index, const vector<int> &id){
   while (p_l != len_l && p_r != len_r){
     if (res_l[p_l] < res_r[p_r]) ret.push_back(res_l[p_l++]);
     else{
-      ret.push_back(res_r[p_r++]);
       if (res_l[p_l] == res_r[p_r]) ++p_l;
+      ret.push_back(res_r[p_r++]);
     }
   }
   while (p_l != len_l) ret.push_back(res_l[p_l++]);
