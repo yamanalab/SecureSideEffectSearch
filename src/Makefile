@@ -27,3 +27,9 @@ findm: findm.cpp
 
 client_datacollect: client_datacollect.cpp
 	$(CC) $(INCLUDES) -o client_datacollect client_datacollect.cpp $(HELIBDIR) $(CFLAGS)
+
+client_datacollect2_fixedinput: client_datacollect2_fixedinput.cpp
+	$(CC) $(INCLUDES) -o client_datacollect2_fixedinput client_datacollect2_fixedinput.cpp $(HELIBDIR) $(CFLAGS)
+
+client_datacollect2_generatedinput: client_datacollect2_generatedinput.cpp
+	$(CC) $(INCLUDES) -o client_datacollect2_generatedinput client_datacollect2_generatedinput.cpp $(HELIBDIR) $(CFLAGS)
