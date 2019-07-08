@@ -117,7 +117,22 @@ vector<int> merge(const vector<int> &medID, const vector<int> &sideID){
 
 int main (int argc, char *argv[]){
 
-  SetNumThreads(NThreads);
+  cout<<"Use default maximum number of threading setting (current value: "<<NThreads<<")?(y/n):";
+  char threading_option;
+  cin>>threading_option;
+  if (threading_option=='y') SetNumThreads(NThreads);
+  else{
+    int numthreads;
+    cout<<"Set maximun number of threading (1-"<<NThreads<<", 1 stands for not using multithreading):";
+    cin>>numthreads;
+    assert(numthreads>=1&&numthreads<=NThreads);
+    SetNumThreads(numthreads);
+
+#if numthreads==1
+  #undef __MULTITHREADING_IN_USE__
+#endif
+
+  }
 
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   // obtain a seed from the system clock
