@@ -82,7 +82,7 @@ int main (int argc, char *argv[]){
   ifstream fin("temp.txt");
   ofstream fout(output_file.c_str());
   fout<<"percentage\tresult\ttotal_time\texcecution_time\tcommunication_time\tdecryption_time"<<endl;
-  for (int t=0;t<1000;++t){
+  for (int t=0;t<200;++t){
 
     tcp::iostream connect(ip_address.c_str(), port.c_str());
     if (!connect){
@@ -113,7 +113,7 @@ int main (int argc, char *argv[]){
       fin>>medID;
       //medID=rand()%totMed;
       assert(medID<totMed);
-      if (find(meds.begin(),meds.end(),medID)==meds.end()) meds.push_back(medID);
+      /*if (find(meds.begin(),meds.end(),medID)==meds.end())*/ meds.push_back(medID);
     }
     //cout<<"Enter number of side effects (>0): ";
     int numSide;//=generator()%4+1;
@@ -126,7 +126,7 @@ int main (int argc, char *argv[]){
       //sideID=generator()%totSide;
       fin>>sideID;
       assert(sideID<totSide);
-      if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
+      /*if (find(sides.begin(),sides.end(),sideID)==sides.end())*/ sides.push_back(sideID);
     }
     auto start_timer = std::chrono::system_clock::now();
 

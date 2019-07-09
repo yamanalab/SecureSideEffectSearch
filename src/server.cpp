@@ -130,6 +130,7 @@ int main (int argc, char *argv[]){
 
 #if numthreads==1
   #undef __MULTITHREADING_IN_USE__
+  cout<<"Successfuly turned off multithreading"<<endl;
 #endif
 
   }

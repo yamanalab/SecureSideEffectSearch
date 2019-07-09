@@ -89,7 +89,10 @@ int main (int argc, char *argv[]){
   std::mt19937 generator(seed);
 
   ofstream fout ("temp.txt");
-  for (int t=0;t<1000;++t){
+  for (int t=0;t<200;++t){
+
+    int t_opt=t/40+1;
+
     int age=generator()%123;
     assert(age>=0&&age<=122);
     //cout<<"Enter gender:(m/f)";
@@ -106,32 +109,34 @@ int main (int argc, char *argv[]){
     int numMed=generator()%19+1;
     //cin>>numMed;
     assert(numMed>0);
-    fout<<numMed<<" ";
+    //fout<<numMed<<" ";
     //cout<<"Enter medicine ID (total "<<numMed<<", 0-"<<totMed-1<<"): ";
     vector<int> meds;
     for (int i=0;i<numMed;++i){
       int medID;
       //cin>>medID;
-      medID=rand()%totMed;
+      medID=rand()%(totMed*t_opt/5);
       assert(medID<totMed);
       if (find(meds.begin(),meds.end(),medID)==meds.end()) meds.push_back(medID);
     }
+    fout<<meds.size()<<" ";
     for (auto i:meds) fout<<i<<" ";
     //cout<<"Enter number of side effects (>0): ";
     int numSide=generator()%4+1;
     //cin>>numSide;
     assert(numSide>0);
     //cout<<"Enter side effect ID (total "<<numSide<<", 0-"<<totSide-1<<"): ";
-    fout<<numSide<<" ";
+    //fout<<numSide<<" ";
     vector<int> sides;
     for (int i=0;i<numSide;++i){
       int sideID;
-      sideID=generator()%totSide;
+      sideID=generator()%(totSide*t_opt/5);
       //cin>>sideID;
       assert(sideID<totSide);
       if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
     }
-    for (auto i:numSide) fout<<i<<" ";
+    fout<<sides.size()<<" ";
+    for (auto i:sides) fout<<i<<" ";
     fout<<endl;
 
     /*
