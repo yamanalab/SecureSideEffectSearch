@@ -18,6 +18,8 @@
 #include <boost/asio/ip/tcp.hpp>
 using namespace std;
 
+NTL_CLIENT
+
 //#define __DEBUG__
 //#define __MULTITHREADING_IN_USE__
 
