@@ -10,6 +10,8 @@
 #include <fstream>
 using namespace std;
 
+NTL_CLIENT
+
 // generate keyset and context
 
 int main (void){

@@ -15,6 +15,8 @@
 #include <boost/asio/ip/tcp.hpp>
 using namespace std;
 
+NTL_CLIENT
+
 // Forked from yuishi's repository
 
 int main()
