@@ -273,7 +273,7 @@ int main (int argc, char *argv[]){
 
         for (long i=first;i<last;++i){
 
-          //cout<<" Lvl --> Before addition: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> Before addition: "<<chunk_res[i].findNaturalHeight()<<endl;
 
           for (int j=0;j<chunks[i].size();++j){
             vector<long> posindicator_long=allzero_long;
@@ -291,7 +291,7 @@ int main (int argc, char *argv[]){
             // false means not minus
           }
 
-          //cout<<" Lvl --> After addition: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After addition: "<<chunk_res[i].findNaturalHeight()<<endl;
           #ifdef __DEBUG__
           FHESecKey secretKey(context);
           ifstream fskey("../settings/sk.bin", std::ios::binary);
@@ -341,10 +341,10 @@ int main (int argc, char *argv[]){
 
 
 
-          //cout<<" Lvl --> After ranging: "<<rangemul[0].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After ranging: "<<rangemul[0].findNaturalHeight()<<endl;
 
           while (rangemul.size()>1){
-            //cout<<" Lvl --> current rangemul size: "<<rangemul.size()<<" level: "<<rangemul[0].findBaseLevel()<<endl;
+            //cout<<" Lvl --> current rangemul size: "<<rangemul.size()<<" level: "<<rangemul[0].findNaturalHeight()<<endl;
             vector<Ctxt> rangemul_derived;
             for (int j=0;j<rangemul.size();j+=2){
               if (j+1<rangemul.size()) rangemul[j].multiplyBy(rangemul[j+1]);
@@ -363,7 +363,7 @@ int main (int argc, char *argv[]){
             ea.decrypt(chunk_res[i], secretKey, decrypted);
             for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
             cout<<endl;
-            cout<<"Level: "<<chunk_res[i].findBaseLevel()<<endl;
+            cout<<"Level: "<<chunk_res[i].findNaturalHeight()<<endl;
           }
           #endif
 
@@ -380,12 +380,12 @@ int main (int argc, char *argv[]){
             ea.decrypt(chunk_res[i], secretKey, decrypted);
             for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
             cout<<endl;
-            cout<<"Level: "<<chunk_res[i].findBaseLevel()<<endl;
+            cout<<"Level: "<<chunk_res[i].findNaturalHeight()<<endl;
           }
           #endif
 
 
-          //cout<<" Lvl --> After randomize: "<<chunk_res[i].findBaseLevel()<<endl;
+          //cout<<" Lvl --> After randomize: "<<chunk_res[i].findNaturalHeight()<<endl;
 
         }
 
