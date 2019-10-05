@@ -1,5 +1,7 @@
 FROM ubuntu:bionic
 
+ENV LD_LIBRARY_PATH /usr/local/lib
+
 RUN apt-get update && \
     apt-get install -y git \
                        build-essential \
@@ -50,4 +52,4 @@ RUN make keygen \
 		 client_datacollect2_fixedinput \
 		 client_datacollect2_generatedinput
 
-CMD ['/bin/bash']
+CMD ["/bin/bash"]
