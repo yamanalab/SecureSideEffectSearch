@@ -5,9 +5,9 @@ services:
     image: meiji-nifty:latest
     command: bash -c "cd /source/src && ./keygen && ./data_enc"
     volumes:
-      - auxdata:/source/src/auxdata
-      - encdata:/source/src/encdata
-      - settings:/source/src/settings
+      - auxdata:/source/auxdata
+      - encdata:/source/encdata
+      - settings:/source/settings
     networks:
       - localnet
   client:
@@ -15,7 +15,7 @@ services:
     image: meiji-nifty:latest
     command: bash -c "cd /source/src && ./client server 10200"
     volumes:
-      - settings:/source/src/settings
+      - settings:/source/settings
     networks:
       - localnet
     depends_on:
@@ -25,9 +25,9 @@ services:
     image: meiji-nifty:latest
     command: bash -c "cd /source/src && ./server 10200"
     volumes:
-      - auxdata:/source/src/auxdata
-      - encdata:/source/src/encdata
-      - settings:/source/src/settings
+      - auxdata:/source/auxdata
+      - encdata:/source/encdata
+      - settings:/source/settings
     networks:
       - localnet
     depends_on:
