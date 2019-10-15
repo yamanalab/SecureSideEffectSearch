@@ -1,0 +1,43 @@
+version: "3"
+services:
+  ca:
+    build: .
+    image: meiji-nifty:latest
+    command: bash -c "cd /source/src && ./keygen && ./data_enc"
+    volumes:
+      - auxdata:/source/auxdata
+      - encdata:/source/encdata
+      - settings:/source/settings
+    networks:
+      - localnet
+  client:
+    build: .
+    image: meiji-nifty:latest
+    command: bash -c "cd /source/src && ./client server 80"
+    volumes:
+      - settings:/source/settings
+    networks:
+      - localnet
+    depends_on:
+      - ca
+  server:
+    build: .
+    image: meiji-nifty:latest
+    command: bash -c "cd /source/src && ./server 80"
+    volumes:
+      - auxdata:/source/auxdata
+      - encdata:/source/encdata
+      - settings:/source/settings
+    networks:
+      - localnet
+    depends_on:
+      - ca
+
+volumes:
+  auxdata:
+  encdata:
+  settings:
+
+networks:
+  localnet:
+    driver: bridge
