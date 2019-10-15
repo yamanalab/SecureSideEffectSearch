@@ -13,7 +13,7 @@ services:
   client:
     build: .
     image: meiji-nifty:latest
-    command: bash -c "cd /source/src && ./client server 10200"
+    command: bash -c "cd /source/src && ./client server 80"
     volumes:
       - settings:/source/settings
     networks:
@@ -23,7 +23,7 @@ services:
   server:
     build: .
     image: meiji-nifty:latest
-    command: bash -c "cd /source/src && ./server 10200"
+    command: bash -c "cd /source/src && ./server 80"
     volumes:
       - auxdata:/source/auxdata
       - encdata:/source/encdata
@@ -40,3 +40,4 @@ volumes:
 
 networks:
   localnet:
+    driver: bridge
