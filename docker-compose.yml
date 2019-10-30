@@ -8,6 +8,7 @@ services:
       - auxdata:/source/auxdata
       - encdata:/source/encdata
       - settings:/source/settings
+      - src:/source/src
     networks:
       - localnet
   client:
@@ -16,6 +17,7 @@ services:
     command: bash -c "cd /source/src && ./client server 80"
     volumes:
       - settings:/source/settings
+      - src:/source/src
     networks:
       - localnet
     depends_on:
@@ -28,6 +30,7 @@ services:
       - auxdata:/source/auxdata
       - encdata:/source/encdata
       - settings:/source/settings
+      - src:/source/src
     networks:
       - localnet
     depends_on:
