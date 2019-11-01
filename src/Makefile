@@ -7,6 +7,8 @@ HELIBDIR = /usr/local/src/HElib/src/fhe.a
 
 #g++ -I/home/ameki/github/HElib/src keygen.cpp /home/ameki/github/HElib/src/fhe.a -o keygen -lntl -lgmp -lm -pthread
 
+all: keygen client server update data_enc findm
+
 keygen: keygen.cpp
 	$(CC) $(INCLUDES) -o keygen keygen.cpp $(HELIBDIR) $(CFLAGS)
 
@@ -33,3 +35,5 @@ client_datacollect2_fixedinput: client_datacollect2_fixedinput.cpp
 
 client_datacollect2_generatedinput: client_datacollect2_generatedinput.cpp
 	$(CC) $(INCLUDES) -o client_datacollect2_generatedinput client_datacollect2_generatedinput.cpp $(HELIBDIR) $(CFLAGS)
+
+.PHONY: keygen client server update data_enc findm
