@@ -15,6 +15,7 @@
 #include <chrono>
 #include <random>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 using namespace std;
@@ -71,7 +72,7 @@ int main (int argc, char *argv[]){
   fpkey.close();
   //read publicKey from pk.bin
 
-  assert(argc==3);
+  assert(argc==7);
   string ip_address(argv[1]);
   string port(argv[2]);
 
@@ -83,42 +84,31 @@ int main (int argc, char *argv[]){
   }
 
   cout<<return_current_time_and_date()<<" Successfully created connection with "<<ip_address<<":"<<port<<endl;
-  cout<<"Enter age:(0-122)";
-  int age;
-  cin>>age;
+  int age = stoi(argv[3]);
   assert(age>=0&&age<=122);
-  cout<<"Enter gender:(m/f)";
-  char gender;
-  cin>>gender;
+  char gender = *argv[4];
   assert(gender=='m'||gender=='f');
   int mask=age+(gender=='m'?1:0)*128+5;
   Ctxt enc_mask(publicKey);
   publicKey.Encrypt(enc_mask, to_ZZX(mask));
-  cout<<"Age and gender information successfully encrypted."<<endl;
-  cout<<"Enter number of medicine (>0): ";
-  int numMed;
-  cin>>numMed;
-  assert(numMed>0);
-  cout<<"Enter medicine ID (total "<<numMed<<", 0-"<<totMed-1<<"): ";
+  vector<string> tmp;
   vector<int> meds;
-  for (int i=0;i<numMed;++i){
-    int medID;
-    cin>>medID;
+  boost::algorithm::split(tmp, argv[5], boost::is_any_of(","));
+  for (string s : tmp) {
+    int medID = stoi(s);
     assert(medID<totMed);
     if (find(meds.begin(),meds.end(),medID)==meds.end()) meds.push_back(medID);
   }
-  cout<<"Enter number of side effects (>0): ";
-  int numSide;
-  cin>>numSide;
-  assert(numSide>0);
-  cout<<"Enter side effect ID (total "<<numSide<<", 0-"<<totSide-1<<"): ";
+  assert(meds.size()>0);
+  tmp.clear();
   vector<int> sides;
-  for (int i=0;i<numSide;++i){
-    int sideID;
-    cin>>sideID;
+  boost::algorithm::split(tmp, argv[6], boost::is_any_of(","));
+  for (string s : tmp) {
+    int sideID = stoi(s);
     assert(sideID<totSide);
     if (find(sides.begin(),sides.end(),sideID)==sides.end()) sides.push_back(sideID);
   }
+  assert(sides.size()>0);
   auto start_timer = std::chrono::system_clock::now();
 
   connect<<enc_mask;
