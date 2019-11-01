@@ -37,7 +37,7 @@ Server Side
 
 Client Side
 - client.cpp
-1. Usage: `client [IP Address] [PORT]`
+1. Usage: `client [IP Address] [PORT] [age] [gender] [list of query medicines] [query side effects]`
 2. How it works?
     1. Try to connect to `[IP Address]:[PORT]`.
     2. Receive [age] [gender] [number of query medicine] [List of query medicines] [number of query side effects] [List of query side effects] from user.
