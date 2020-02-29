@@ -132,28 +132,6 @@ vector<int> merge(const vector<int> &medID, const vector<int> &sideID)
 
 int main(int argc, char *argv[])
 {
-
-    cout << "Use default maximum number of threading setting (current value: "
-         << NThreads << ")?(y/n):";
-    char threading_option;
-    cin >> threading_option;
-    if (threading_option == 'y')
-        SetNumThreads(NThreads);
-    else
-    {
-        int numthreads;
-        cout << "Set maximun number of threading (1-" << NThreads
-             << ", 1 stands for not using multithreading):";
-        cin >> numthreads;
-        assert(numthreads >= 1 && numthreads <= NThreads);
-        SetNumThreads(numthreads);
-
-#if numthreads == 1
-#undef __MULTITHREADING_IN_USE__
-        cout << "Successfuly turned off multithreading" << endl;
-#endif
-    }
-
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     // obtain a seed from the system clock
     std::mt19937 generator(seed);
@@ -226,13 +204,28 @@ int main(int argc, char *argv[])
     findexside.close();
     // read invertedindex for side effects from side.inv
 
-    assert(argc == 2);
+    assert(argc == 2 || argc == 3);
     const vector<long> allzero_long(nslots, 0);
     Ctxt allzero(publicKey);
     ea.encrypt(allzero, publicKey, allzero_long);
 
     string port_str(argv[1]);
     int port = stoi(port_str);
+    if (argc == 3)
+    {
+        int numthreads = stoi(argv[2]);
+        assert(numthreads >= 1 && numthreads <= NThreads);
+        SetNumThreads(numthreads);
+        if (numthreads == 1)
+        {
+#undef __MULTITHREADING_IN_USE__
+            cout << "Successfuly turned off multithreading" << endl;
+        }
+    }
+    else
+    {
+        SetNumThreads(NThreads);
+    }
 
     using boost::asio::ip::tcp;
     boost::asio::io_service ios;

@@ -20,7 +20,7 @@ Server Side
     3. It will generate auxiliary information for new record.
 
 - server.cpp
-1. Usage: `server [PORT]`
+1. Usage: `server [PORT] ([number of thread] default: 28)`
 2. How it works?
     1. Listen to PORT until a user replies.
     2. Receive [(Encrypted) query mask] [number of query medicine] [List of query medicines] [number of query side effects] [List of query side effects] from client.
