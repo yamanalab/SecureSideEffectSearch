@@ -17,6 +17,7 @@
 #include <thread>
 #include "EncryptedArray.h"
 #include "FHE.h"
+#include "picojson.h"
 #include "timing.h"
 using namespace std;
 
@@ -194,15 +195,15 @@ int main(int argc, char *argv[])
     cout << return_current_time_and_date() << " Session with server is over."
          << endl;
 
-    cout << "Show result list?(y/n)";
-    char c;
-    cin >> c;
-    if (c == 'Y' || c == 'y')
+    picojson::object pico_obj;
+    picojson::array pico_array;
+    for (int record : records)
     {
-        cout << "Result list:" << endl;
-        for (int i = 0; i < numRes; ++i)
-            cout << records[i] << endl;
+        pico_array.push_back(picojson::value(static_cast<double>(record)));
     }
+    pico_obj.insert(make_pair("records", pico_array));
+    picojson::value json = picojson::value(pico_obj);
+    cout << json.serialize() << endl;
 
     return 0;
 }
