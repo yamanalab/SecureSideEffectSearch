@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    cout << return_current_time_and_date()
+    cerr << return_current_time_and_date()
          << " Successfully created connection with " << ip_address << ":"
          << port << endl;
     int age = stoi(argv[3]);
@@ -151,9 +151,9 @@ int main(int argc, char *argv[])
         vector<long> decrypted;
         ea.decrypt(chunks_res[i], secretKey, decrypted);
         /*
-        cout<<"Chunk #"<<i<<endl;
-        for (int j=0;j<100;++j) cout<<i*100+j<<":"<<decrypted[j]<<" ";
-        cout<<endl;
+        cerr<<"Chunk #"<<i<<endl;
+        for (int j=0;j<100;++j) cerr<<i*100+j<<":"<<decrypted[j]<<" ";
+        cerr<<endl;
         */
         for (int j = 0; j < decrypted.size(); ++j)
             if (decrypted[j] == 0)
@@ -184,15 +184,15 @@ int main(int argc, char *argv[])
     connect >> exec_time >> comm_time >> percentage;
     auto end_timer = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end_timer - start_timer;
-    cout << "Server has completed running in " << exec_time << " seconds."
+    cerr << "Server has completed running in " << exec_time << " seconds."
          << endl;
-    cout << "Communication spent " << comm_time
+    cerr << "Communication spent " << comm_time
          << " seconds from server's POV and decryption spent "
          << diff_dec.count() << " seconds from client's POV." << endl;
-    cout << "Total record number hit: " << numRes << endl;
-    cout << "The whole session has used " << diff.count() << " seconds."
+    cerr << "Total record number hit: " << numRes << endl;
+    cerr << "The whole session has used " << diff.count() << " seconds."
          << endl;
-    cout << return_current_time_and_date() << " Session with server is over."
+    cerr << return_current_time_and_date() << " Session with server is over."
          << endl;
 
     picojson::object pico_obj;
