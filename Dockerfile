@@ -35,7 +35,7 @@ RUN	mkdir -p /usr/local/src && \
 	cd /usr/local/src && \
 	git clone https://github.com/homenc/HElib.git && \
 	cd HElib && \
-	git checkout 63ade33 && \
+	git checkout 8c43c402796495081f83baea49143daa8583371d && \
 	cd src && \
 	make
 
