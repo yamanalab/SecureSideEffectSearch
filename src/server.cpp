@@ -174,11 +174,12 @@ int main(int argc, char *argv[])
         int numindex;
         findexmed >> numindex;
         vector<int> tempindex;
-        while (numindex--)
+        while (numindex > 0)
         {
             int temprec;
             findexmed >> temprec;
             tempindex.push_back(temprec);
+            numindex--;
         }
         medIndex.push_back(tempindex);
     }
@@ -193,11 +194,12 @@ int main(int argc, char *argv[])
         int numindex;
         findexside >> numindex;
         vector<int> tempindex;
-        while (numindex--)
+        while (numindex > 0)
         {
             int temprec;
             findexside >> temprec;
             tempindex.push_back(temprec);
+            numindex--;
         }
         sideIndex.push_back(tempindex);
     }
