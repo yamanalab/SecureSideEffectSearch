@@ -1,6 +1,7 @@
 #include <NTL/BasicThreadPool.h>
 #include <NTL/ZZ.h>
 #include <NTL/lzz_pXFactoring.h>
+#include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <cassert>
@@ -498,9 +499,35 @@ int main(int argc, char *argv[])
 
             numchoice = choice_list.size();
             client << numchoice << endl;
+            int record_id;
+            vector<string> tmp;
+            string auxdata_path, line, cutted_line;
+            size_t begin_idx, end_idx;
             for (int i = 0; i < numchoice; ++i)
-                client << chunks[choice_list[i].first][choice_list[i].second]
-                       << endl;
+            {
+                record_id = chunks[choice_list[i].first][choice_list[i].second];
+                client << record_id << endl;
+                auxdata_path = "../auxdata/" + to_string(record_id) + ".bin";
+                ifstream auxdata_ifs(auxdata_path, ios::binary);
+                while (getline(auxdata_ifs, line))
+                {
+                    begin_idx = line.find("[");
+                    end_idx = line.find("]");
+                    cutted_line =
+                      line.substr(begin_idx + 1, end_idx - begin_idx - 1);
+                    boost::algorithm::split(tmp, cutted_line,
+                                            boost::is_any_of(","));
+                    client << tmp.size() << endl;
+                    for (string s : tmp)
+                    {
+                        if (size_t idx = s.find(" "); idx != string::npos)
+                        {
+                            s.erase(idx, 1);
+                        }
+                        client << stoi(s) << endl;
+                    }
+                }
+            }
             client << time_servercalc.count() << endl;
             client << time_servercomm.count() << endl;
             client << percentage << endl;

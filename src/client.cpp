@@ -1,6 +1,7 @@
 #include <NTL/BasicThreadPool.h>
 #include <NTL/ZZ.h>
 #include <NTL/lzz_pXFactoring.h>
+
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
@@ -15,9 +16,10 @@
 #include <random>
 #include <sstream>
 #include <thread>
+
 #include "EncryptedArray.h"
 #include "FHE.h"
-#include "picojson.h"
+#include "picojson_wrapper.h"
 #include "timing.h"
 using namespace std;
 
@@ -37,7 +39,37 @@ string return_current_time_and_date()
     return ss.str();
 }
 
-int main(int argc, char *argv[])
+class Record
+{
+    int id_;
+    vector<int> medicine_ids_;
+    vector<int> symptom_ids_;
+
+public:
+    Record()
+    {
+    }
+    Record(const int& id, const vector<int>& medicine_ids,
+           const vector<int>& symptom_ids)
+      : id_(id), medicine_ids_(medicine_ids), symptom_ids_(symptom_ids)
+    {
+    }
+
+    const int& id() const
+    {
+        return id_;
+    }
+    const vector<int>& medicine_ids() const
+    {
+        return medicine_ids_;
+    }
+    const vector<int>& symptom_ids() const
+    {
+        return symptom_ids_;
+    }
+};
+
+int main(int argc, char* argv[])
 {
 
     ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
@@ -171,14 +203,30 @@ int main(int argc, char *argv[])
 
     connect.flush();
 
-    int numRes;
+    int numRes, numMed, numSide;
     connect >> numRes;
-    vector<int> records;
+    vector<Record> records(numRes);
+    int id;
+    vector<int> searched_medicine_ids, searched_symptom_ids;
+    Record record;
     for (int i = 0; i < numRes; ++i)
     {
-        int recID;
-        connect >> recID;
-        records.push_back(recID);
+        connect >> id;
+        connect >> numMed;
+        searched_medicine_ids.resize(numMed);
+        for (int j = 0; j < numMed; ++j)
+        {
+            connect >> searched_medicine_ids[j];
+        }
+        connect >> numSide;
+        searched_symptom_ids.resize(numSide);
+        for (int k = 0; k < numSide; ++k)
+        {
+            connect >> searched_symptom_ids[k];
+        }
+        record = Record(move(id), move(searched_medicine_ids),
+                        move(searched_symptom_ids));
+        records[i] = move(record);
     }
     double exec_time, comm_time, percentage;
     connect >> exec_time >> comm_time >> percentage;
@@ -195,14 +243,15 @@ int main(int argc, char *argv[])
     cerr << return_current_time_and_date() << " Session with server is over."
          << endl;
 
-    picojson::object pico_obj;
-    picojson::array pico_array;
-    for (int record : records)
-    {
-        pico_array.push_back(picojson::value(static_cast<double>(record)));
-    }
-    pico_obj.insert(make_pair("records", pico_array));
-    picojson::value json = picojson::value(pico_obj);
+    Json json;
+    json.add<Record>("records", records, [](Record r) {
+        Json j;
+        j.add("id", r.id());
+        j.add("medicine_ids", r.medicine_ids());
+        j.add("symptom_ids", r.symptom_ids());
+        return j;
+    });
+
     cout << json.serialize() << endl;
 
     return 0;
