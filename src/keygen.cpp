@@ -1,12 +1,15 @@
 #include <NTL/BasicThreadPool.h>
 #include <NTL/ZZ.h>
 #include <NTL/lzz_pXFactoring.h>
+
 #include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+
 #include "EncryptedArray.h"
 #include "FHE.h"
+#include "filepath_info.h"
 #include "timing.h"
 using namespace std;
 
@@ -17,7 +20,7 @@ NTL_CLIENT
 int main(void)
 {
 
-    ifstream fin("../settings/contextsetting.txt");
+    ifstream fin(FHE_CONTEXT_SETTING_FILE_PATH);
     long m, p, r, L, c, w, d, security;
     fin >> p >> r >> L >> c >> w >> d >> security;
     fin.close();
@@ -62,17 +65,17 @@ int main(void)
 
     cout << "Key Generated Successfully" << endl;
 
-    ofstream fpkey("../settings/pk.bin", std::ios::binary);
+    ofstream fpkey(FHE_PK_FILE_PATH, std::ios::binary);
     fpkey << publicKey << endl;
     fpkey.close();
     // store publicKey in pk.bin
 
-    ofstream fskey("../settings/sk.bin", std::ios::binary);
+    ofstream fskey(FHE_SK_FILE_PATH, std::ios::binary);
     fskey << secretKey << endl;
     fskey.close();
     // store secretKey in sk.bin
 
-    ofstream fctxt("../settings/context.bin", std::ios::binary);
+    ofstream fctxt(FHE_CONTEXT_FILE_PATH, std::ios::binary);
     writeContextBase(fctxt, context);
     fctxt << context;
     fctxt.close();

@@ -1,6 +1,7 @@
 #include <NTL/BasicThreadPool.h>
 #include <NTL/ZZ.h>
 #include <NTL/lzz_pXFactoring.h>
+
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -14,8 +15,10 @@
 #include <random>
 #include <sstream>
 #include <thread>
+
 #include "EncryptedArray.h"
 #include "FHE.h"
+#include "filepath_info.h"
 #include "timing.h"
 using namespace std;
 
@@ -38,7 +41,7 @@ string return_current_time_and_date()
 int main(int argc, char *argv[])
 {
 
-    ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+    ifstream fdbbasics(DBBASICS_FILE_PATH, std::ios::binary);
     bool dbstatus;
     assert(fdbbasics >> dbstatus);
     assert(dbstatus);
@@ -48,7 +51,7 @@ int main(int argc, char *argv[])
     assert(fdbbasics >> totSide);
     fdbbasics.close();
 
-    ifstream fctxt("../settings/context.bin", std::ios::binary);
+    ifstream fctxt(FHE_CONTEXT_FILE_PATH, std::ios::binary);
     unsigned long m, p, r;
     std::vector<long> gens, ords;
     readContextBase(fctxt, m, p, r, gens, ords);
@@ -62,13 +65,13 @@ int main(int argc, char *argv[])
     // generate ea from context
 
     FHESecKey secretKey(context);
-    ifstream fskey("../settings/sk.bin", std::ios::binary);
+    ifstream fskey(FHE_SK_FILE_PATH, std::ios::binary);
     assert(fskey >> secretKey);
     fskey.close();
     // read secretKey from sk.bin
 
     FHEPubKey publicKey(context);
-    ifstream fpkey("../settings/pk.bin", std::ios::binary);
+    ifstream fpkey(FHE_PK_FILE_PATH, std::ios::binary);
     assert(fpkey >> publicKey);
     fpkey.close();
     // read publicKey from pk.bin

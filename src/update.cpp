@@ -1,33 +1,31 @@
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
+
+#include "filepath_info.h"
 using namespace std;
 
 // This file update invertedindex
-// Usage: update [FILENAME FOR ENCRYPTED MASK] [num(MedID)] [List<MedID>]
-// [num(SideID)] [List<SideID>]
+// Usage: update [RECORD ID] [FILENAME FOR ENCRYPTED MASK] [num(MedID)]
+// [List<MedID>] [num(SideID)] [List<SideID>]
 
 int main(int argc, char* argv[])
 {
 
-    assert(argc > 5);
+    assert(argc > 6);
     cout << "argc: " << argc << endl;
-    // Must contains at least 5 parameters
+    // Must contains at least 6 parameters
 
-    ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
-    bool dbstatus;
-    assert(fdbbasics >> dbstatus);
-    assert(dbstatus);
-    int numRec, totMed, totSide;
-    assert(fdbbasics >> numRec);
-    assert(fdbbasics >> totMed);
-    assert(fdbbasics >> totSide);
-    fdbbasics.close();
+    size_t recordId = stoi(argv[1]);
+    string filename(argv[2]);
+    cout << "recordId: " << recordId << endl;
 
-    string filename(argv[1]);
     try
     {
         ifstream ftest(filename.c_str(), std::ios::binary);
@@ -41,42 +39,40 @@ int main(int argc, char* argv[])
         return 1;
     };
 
-    const string numMed_str(argv[2]);
+    const string numMed_str(argv[3]);
     const int numMed = stoi(numMed_str);
     cout << "numMed: " << numMed << endl;
 
     vector<int> meds;
-    assert(argc >= 5 + numMed);
+    assert(argc >= 6 + numMed);
     for (int i = 0; i < numMed; ++i)
     {
-        const string medID_str(argv[3 + i]);
+        const string medID_str(argv[4 + i]);
         const int medID = stoi(medID_str);
-        assert(medID < totMed);
         if (find(meds.begin(), meds.end(), medID) == meds.end())
             meds.push_back(medID);
     }
 
-    const string numSide_str(argv[3 + numMed]);
+    const string numSide_str(argv[4 + numMed]);
     const int numSide = stoi(numSide_str);
     cout << "numSide: " << numSide << endl;
 
     vector<int> sides;
-    assert(argc == 4 + numMed + numSide);
+    assert(argc == 5 + numMed + numSide);
     for (int i = 0; i < numSide; ++i)
     {
-        const string sideID_str(argv[4 + numMed + i]);
+        const string sideID_str(argv[5 + numMed + i]);
         const int sideID = stoi(sideID_str);
-        assert(sideID < totSide);
         if (find(sides.begin(), sides.end(), sideID) == sides.end())
             sides.push_back(sideID);
     }
 
     string copy_str =
-      "mv " + filename + " ../encdata/" + to_string(numRec) + ".bin";
+      "mv " + filename + " " + ENCDATA_DIR_PATH + to_string(recordId) + ".bin";
     cout << "Calling: " << copy_str << endl;
     system(copy_str.c_str());
 
-    string auxfilename = "../auxdata/" + to_string(numRec) + ".bin";
+    string auxfilename = AUXDATA_DIR_PATH + to_string(recordId) + ".bin";
 
     ofstream faux(auxfilename.c_str(), std::ios::binary);
     faux << "Medicine: [" << meds[0];
@@ -89,22 +85,27 @@ int main(int argc, char* argv[])
     faux << "]" << endl;
     faux.close();
 
-    ofstream fdbbasicsw("../settings/dbbasics.bin", std::ios::binary);
-    fdbbasicsw << dbstatus << endl;
-    fdbbasicsw << numRec + 1 << endl;
-    fdbbasicsw << totMed << endl;
-    fdbbasicsw << totSide << endl;
-    fdbbasicsw.close();
+    // ofstream fdbbasicsw(DBBASICS_FILE_PATH, std::ios::binary);
+    // fdbbasicsw << dbstatus << endl;
+    // fdbbasicsw << numRec + 1 << endl;
+    // fdbbasicsw << totMed << endl;
+    // fdbbasicsw << totSide << endl;
+    // fdbbasicsw.close();
 
-    vector<vector<int>> medIndex;
-    vector<vector<int>> sideIndex;
-    ifstream findexmed("../auxdata/med.inv", std::ios::binary);
+    map<int, vector<int>> medIndex;
+    map<int, vector<int>> sideIndex;
+
+    ifstream findexmed(MED_INV_FILE_PATH, std::ios::binary);
+    string line;
+    vector<string> medInfo;
     int numMedDict;
     findexmed >> numMedDict;
     for (int i = 0; i < numMedDict; ++i)
     {
-        int numindex;
-        findexmed >> numindex;
+        findexmed >> line;
+        boost::algorithm::split(medInfo, line, boost::is_any_of(":"));
+        int medId = stoi(medInfo[0]);
+        int numindex = stoi(medInfo[1]);
         vector<int> tempindex;
         while (numindex--)
         {
@@ -112,17 +113,20 @@ int main(int argc, char* argv[])
             findexmed >> temprec;
             tempindex.push_back(temprec);
         }
-        medIndex.push_back(tempindex);
+        medIndex.insert(make_pair(medId, tempindex));
     }
     findexmed.close();
 
-    ifstream findexside("../auxdata/side.inv", std::ios::binary);
+    ifstream findexside(SIDE_INV_FILE_PATH, std::ios::binary);
+    vector<string> sideInfo;
     int numSideDict;
     findexside >> numSideDict;
     for (int i = 0; i < numSideDict; ++i)
     {
-        int numindex;
-        findexside >> numindex;
+        findexside >> line;
+        boost::algorithm::split(sideInfo, line, boost::is_any_of(":"));
+        int sideId = stoi(sideInfo[0]);
+        int numindex = stoi(sideInfo[1]);
         vector<int> tempindex;
         while (numindex--)
         {
@@ -130,37 +134,58 @@ int main(int argc, char* argv[])
             findexside >> temprec;
             tempindex.push_back(temprec);
         }
-        sideIndex.push_back(tempindex);
+        sideIndex.insert(make_pair(sideId, tempindex));
     }
     findexside.close();
 
     for (int i = 0; i < numMed; ++i)
-        medIndex[meds[i]].push_back(numRec);
+        medIndex[meds[i]].push_back(recordId);
     for (int i = 0; i < numSide; ++i)
-        sideIndex[sides[i]].push_back(numRec);
+        sideIndex[sides[i]].push_back(recordId);
     cout << "Updated rev index" << endl;
 
-    ofstream findexmedw("../auxdata/med.inv", std::ios::binary);
+    ofstream findexmedw(MED_INV_FILE_PATH, std::ios::binary);
     findexmedw << numMedDict << endl;
-    for (int i = 0; i < numMedDict; ++i)
+    for (const auto& medIdxPair : medIndex)
     {
-        findexmedw << medIndex[i].size() << endl;
-        for (int j = 0; j < medIndex[i].size(); ++j)
-            findexmedw << medIndex[i][j] << endl;
+        int medId = medIdxPair.first;
+        vector<int> recordIds = medIdxPair.second;
+        findexmedw << medId << ":" << recordIds.size() << endl;
+        for (const int& recordId : recordIds)
+        {
+            findexmedw << recordId << endl;
+        }
     }
+    // for (int i = 0; i < numMedDict; ++i)
+    // {
+    //     findexmedw << medIndex[i].size() << endl;
+    //     for (int j = 0; j < medIndex[i].size(); ++j)
+    //         findexmedw << medIndex[i][j] << endl;
+    // }
     findexmedw.close();
 
-    ofstream findexsidew("../auxdata/side.inv", std::ios::binary);
+    ofstream findexsidew(SIDE_INV_FILE_PATH, std::ios::binary);
     findexsidew << numSideDict << endl;
-    for (int i = 0; i < numSideDict; ++i)
+    for (const auto& sideIdxPair : sideIndex)
     {
-        findexsidew << sideIndex[i].size() << endl;
-        for (int j = 0; j < sideIndex[i].size(); ++j)
-            findexsidew << sideIndex[i][j] << endl;
+        int sideId = sideIdxPair.first;
+        vector<int> recordIds = sideIdxPair.second;
+        findexsidew << sideId << ":" << recordIds.size() << endl;
+        for (const int& recordId : recordIds)
+        {
+            findexsidew << recordId << endl;
+        }
     }
+    // for (int i = 0; i < numSideDict; ++i)
+    // {
+    //     findexsidew << sideIndex[i].size() << endl;
+    //     for (int j = 0; j < sideIndex[i].size(); ++j)
+    //         findexsidew << sideIndex[i][j] << endl;
+    // }
     findexsidew.close();
 
-    cout << "New record as: #" << numRec << endl;
+    // cout << "New record as: #" << numRec << endl;
+    cout << "New record id: " << recordId << endl;
     cout << "DB successfully updated." << endl;
 
     return 0;

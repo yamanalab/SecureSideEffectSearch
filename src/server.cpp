@@ -1,6 +1,7 @@
 #include <NTL/BasicThreadPool.h>
 #include <NTL/ZZ.h>
 #include <NTL/lzz_pXFactoring.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -14,8 +15,10 @@
 #include <random>
 #include <sstream>
 #include <thread>
+
 #include "EncryptedArray.h"
 #include "FHE.h"
+#include "filepath_info.h"
 #include "timing.h"
 using namespace std;
 
@@ -49,10 +52,12 @@ string return_current_time_and_date()
     return ss.str();
 }
 
-vector<vector<int>> medIndex;
-vector<vector<int>> sideIndex;
+// vector<vector<int>> medIndex;
+map<int, vector<int>> medIndex;
+// vector<vector<int>> sideIndex;
+map<int, vector<int>> sideIndex;
 
-vector<int> mergeOR(const vector<vector<int>> &index, const vector<int> &id)
+vector<int> mergeOR(const map<int, vector<int>> &index, const vector<int> &id)
 {
 
     int len = id.size();
@@ -65,7 +70,7 @@ vector<int> mergeOR(const vector<vector<int>> &index, const vector<int> &id)
 
     if (len == 1)
     {
-        return index[id[0]];
+        return index.at(id[0]);
     }
 
     const vector<int> id_l = vector<int>(id.begin(), id.begin() + len / 2);
@@ -137,7 +142,7 @@ int main(int argc, char *argv[])
     // obtain a seed from the system clock
     std::mt19937 generator(seed);
 
-    ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+    ifstream fdbbasics(DBBASICS_FILE_PATH, std::ios::binary);
     bool dbstatus;
     assert(fdbbasics >> dbstatus);
     assert(dbstatus);
@@ -147,7 +152,7 @@ int main(int argc, char *argv[])
     assert(fdbbasics >> totSide);
     fdbbasics.close();
 
-    ifstream fctxt("../settings/context.bin", std::ios::binary);
+    ifstream fctxt(FHE_CONTEXT_FILE_PATH, std::ios::binary);
     unsigned long m, p, r;
     std::vector<long> gens, ords;
     readContextBase(fctxt, m, p, r, gens, ords);
@@ -162,18 +167,22 @@ int main(int argc, char *argv[])
     // generate ea from context
 
     FHEPubKey publicKey(context);
-    ifstream fpkey("../settings/pk.bin", std::ios::binary);
+    ifstream fpkey(FHE_PK_FILE_PATH, std::ios::binary);
     assert(fpkey >> publicKey);
     fpkey.close();
     // read publicKey from pk.bin
 
-    ifstream findexmed("../auxdata/med.inv", std::ios::binary);
+    ifstream findexmed(MED_INV_FILE_PATH, std::ios::binary);
+    string line;
+    vector<string> medInfo;
     int numMed;
     findexmed >> numMed;
     for (int i = 0; i < numMed; ++i)
     {
-        int numindex;
-        findexmed >> numindex;
+        findexmed >> line;
+        boost::algorithm::split(medInfo, line, boost::is_any_of(":"));
+        int medId = stoi(medInfo[0]);
+        int numindex = stoi(medInfo[1]);
         vector<int> tempindex;
         while (numindex > 0)
         {
@@ -182,18 +191,21 @@ int main(int argc, char *argv[])
             tempindex.push_back(temprec);
             numindex--;
         }
-        medIndex.push_back(tempindex);
+        medIndex.insert(make_pair(medId, tempindex));
     }
     findexmed.close();
     // read invertedindex for medicine from med.inv
 
-    ifstream findexside("../auxdata/side.inv", std::ios::binary);
+    ifstream findexside(SIDE_INV_FILE_PATH, std::ios::binary);
+    vector<string> sideInfo;
     int numSide;
     findexside >> numSide;
     for (int i = 0; i < numSide; ++i)
     {
-        int numindex;
-        findexside >> numindex;
+        findexside >> line;
+        boost::algorithm::split(sideInfo, line, boost::is_any_of(":"));
+        int sideId = stoi(sideInfo[0]);
+        int numindex = stoi(sideInfo[1]);
         vector<int> tempindex;
         while (numindex > 0)
         {
@@ -202,7 +214,7 @@ int main(int argc, char *argv[])
             tempindex.push_back(temprec);
             numindex--;
         }
-        sideIndex.push_back(tempindex);
+        sideIndex.insert(make_pair(sideId, tempindex));
     }
     findexside.close();
     // read invertedindex for side effects from side.inv
@@ -328,7 +340,7 @@ int main(int argc, char *argv[])
                     ZZX posindicator;
                     ea.encode(posindicator, posindicator_long);
                     string filename =
-                      "../encdata/" + to_string(chunks[i][j]) + ".bin";
+                      ENCDATA_DIR_PATH + to_string(chunks[i][j]) + ".bin";
                     ifstream fdb(filename.c_str(), std::ios::binary);
                     Ctxt encmask(publicKey);
                     assert(fdb >> encmask);
@@ -343,7 +355,7 @@ int main(int argc, char *argv[])
 // cout<<" Lvl --> After addition: "<<chunk_res[i].findNaturalHeight()<<endl;
 #ifdef __DEBUG__
                 FHESecKey secretKey(context);
-                ifstream fskey("../settings/sk.bin", std::ios::binary);
+                ifstream fskey(FHE_SK_FILE_PATH, std::ios::binary);
                 assert(fskey >> secretKey);
                 fskey.close();
                 // read secretKey from sk.bin
@@ -507,7 +519,7 @@ int main(int argc, char *argv[])
             {
                 record_id = chunks[choice_list[i].first][choice_list[i].second];
                 client << record_id << endl;
-                auxdata_path = "../auxdata/" + to_string(record_id) + ".bin";
+                auxdata_path = AUXDATA_DIR_PATH + to_string(record_id) + ".bin";
                 ifstream auxdata_ifs(auxdata_path, ios::binary);
                 while (getline(auxdata_ifs, line))
                 {

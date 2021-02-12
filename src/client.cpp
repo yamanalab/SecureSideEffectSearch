@@ -19,6 +19,7 @@
 
 #include "EncryptedArray.h"
 #include "FHE.h"
+#include "filepath_info.h"
 #include "picojson_wrapper.h"
 #include "timing.h"
 using namespace std;
@@ -42,8 +43,8 @@ string return_current_time_and_date()
 class Record
 {
     int id_;
-    vector<int> medicine_ids_;
-    vector<int> symptom_ids_;
+    vector<int> medicinIds_;
+    vector<int> symptomIds_;
 
 public:
     Record()
@@ -51,7 +52,7 @@ public:
     }
     Record(const int& id, const vector<int>& medicine_ids,
            const vector<int>& symptom_ids)
-      : id_(id), medicine_ids_(medicine_ids), symptom_ids_(symptom_ids)
+      : id_(id), medicinIds_(medicine_ids), symptomIds_(symptom_ids)
     {
     }
 
@@ -59,20 +60,20 @@ public:
     {
         return id_;
     }
-    const vector<int>& medicine_ids() const
+    const vector<int>& medicinIds() const
     {
-        return medicine_ids_;
+        return medicinIds_;
     }
-    const vector<int>& symptom_ids() const
+    const vector<int>& symptomIds() const
     {
-        return symptom_ids_;
+        return symptomIds_;
     }
 };
 
 int main(int argc, char* argv[])
 {
 
-    ifstream fdbbasics("../settings/dbbasics.bin", std::ios::binary);
+    ifstream fdbbasics(DBBASICS_FILE_PATH, std::ios::binary);
     bool dbstatus;
     assert(fdbbasics >> dbstatus);
     assert(dbstatus);
@@ -82,7 +83,7 @@ int main(int argc, char* argv[])
     assert(fdbbasics >> totSide);
     fdbbasics.close();
 
-    ifstream fctxt("../settings/context.bin", std::ios::binary);
+    ifstream fctxt(FHE_CONTEXT_FILE_PATH, std::ios::binary);
     unsigned long m, p, r;
     std::vector<long> gens, ords;
     readContextBase(fctxt, m, p, r, gens, ords);
@@ -96,13 +97,13 @@ int main(int argc, char* argv[])
     // generate ea from context
 
     FHESecKey secretKey(context);
-    ifstream fskey("../settings/sk.bin", std::ios::binary);
+    ifstream fskey(FHE_SK_FILE_PATH, std::ios::binary);
     assert(fskey >> secretKey);
     fskey.close();
     // read secretKey from sk.bin
 
     FHEPubKey publicKey(context);
-    ifstream fpkey("../settings/pk.bin", std::ios::binary);
+    ifstream fpkey(FHE_PK_FILE_PATH, std::ios::binary);
     assert(fpkey >> publicKey);
     fpkey.close();
     // read publicKey from pk.bin
@@ -136,7 +137,6 @@ int main(int argc, char* argv[])
     for (string s : tmp)
     {
         int medID = stoi(s);
-        assert(medID < totMed);
         if (find(meds.begin(), meds.end(), medID) == meds.end())
             meds.push_back(medID);
     }
@@ -147,7 +147,6 @@ int main(int argc, char* argv[])
     for (string s : tmp)
     {
         int sideID = stoi(s);
-        assert(sideID < totSide);
         if (find(sides.begin(), sides.end(), sideID) == sides.end())
             sides.push_back(sideID);
     }
@@ -247,8 +246,8 @@ int main(int argc, char* argv[])
     json.add<Record>("records", records, [](Record r) {
         Json j;
         j.add("id", r.id());
-        j.add("medicine_ids", r.medicine_ids());
-        j.add("symptom_ids", r.symptom_ids());
+        j.add("medicine_ids", r.medicinIds());
+        j.add("symptom_ids", r.symptomIds());
         return j;
     });
 
