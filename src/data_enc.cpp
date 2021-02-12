@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
 
         cout << "Calling: " << sysorder << endl;
 
-        system(sysorder.c_str());
+        int retValue = system(sysorder.c_str());
 
         cout << endl;
         cout << endl;

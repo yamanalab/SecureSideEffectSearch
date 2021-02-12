@@ -1,7 +1,7 @@
 
 CC = g++
 INCLUDES =  -I/usr/local/src/HElib/src
-CFLAGS = -O2 -std=c++11 -lm -pthread -DFHE_THREADS -DFHE_DCRT_THREADS -DFHE_BOOT_THREADS -lntl -lgmp -lboost_system
+CFLAGS = -O2 -std=c++17 -lm -pthread -DFHE_THREADS -DFHE_DCRT_THREADS -DFHE_BOOT_THREADS -lntl -lgmp -lboost_system
 HELIBDIR = /usr/local/src/HElib/src/fhe.a
 
 

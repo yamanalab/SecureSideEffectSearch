@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     string copy_str =
       "mv " + filename + " " + ENCDATA_DIR_PATH + to_string(recordId) + ".bin";
     cout << "Calling: " << copy_str << endl;
-    system(copy_str.c_str());
+    int retValue = system(copy_str.c_str());
 
     string auxfilename = AUXDATA_DIR_PATH + to_string(recordId) + ".bin";
 
