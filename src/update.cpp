@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "filepath_info.h"
+#include "constants.h"
 using namespace std;
 
 // This file update invertedindex

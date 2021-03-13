@@ -19,7 +19,7 @@
 
 #include "EncryptedArray.h"
 #include "FHE.h"
-#include "filepath_info.h"
+#include "constants.h"
 #include "picojson_wrapper.h"
 #include "timing.h"
 using namespace std;
@@ -28,7 +28,8 @@ NTL_CLIENT
 
 // Client holds secret key and public key
 //
-// Usage: client [IP/DOMAIN] [PORT]
+// Usage: client [IP/DOMAIN] [PORT] [AGE (0-122)] [GENDER (m|f|o)]
+//               [MED IDs] [SIDE IDs]
 
 string return_current_time_and_date()
 {
@@ -127,8 +128,8 @@ int main(int argc, char* argv[])
     int age = stoi(argv[3]);
     assert(age >= 0 && age <= 122);
     char gender = *argv[4];
-    assert(gender == 'm' || gender == 'f');
-    int mask = age + (gender == 'm' ? 1 : 0) * 128 + 5;
+    assert(gender == 'm' || gender == 'f' || gender == 'o');
+    int mask = age + static_cast<int>(GENDER_CHAR_MAP.at(gender)) * 128 + 5;
     Ctxt enc_mask(publicKey);
     publicKey.Encrypt(enc_mask, to_ZZX(mask));
     vector<string> tmp;

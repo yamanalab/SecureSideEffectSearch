@@ -18,7 +18,7 @@
 
 #include "EncryptedArray.h"
 #include "FHE.h"
-#include "filepath_info.h"
+#include "constants.h"
 #include "timing.h"
 using namespace std;
 
@@ -29,17 +29,10 @@ NTL_CLIENT
 
 struct Record
 {
-    size_t maskValue;
+    int maskValue;
     std::set<size_t> medicineIds;
     std::set<size_t> symptomIds;
 };
-
-size_t calcMaskValue(const size_t& age, const size_t& gender)
-{
-    assert(0 <= age && age <= 117);
-    assert(gender == 0 || gender == 1);
-    return age + gender * 128 + 5;
-}
 
 int main(int argc, char* argv[])
 {
@@ -63,14 +56,13 @@ int main(int argc, char* argv[])
         totalSymptoms.insert(symptomId);
         if (records.count(id) == 0)
         {
-            size_t age = stoi(record[11]);
-            // <Gender> Female(f): 0, Male(m): 1
-            size_t gender = 1;
-            if (record[12] == "f")
-            {
-                gender = 0;
-            }
-            size_t mask = calcMaskValue(age, gender);
+            int age = stoi(record[11]);
+            assert(age >= 0 && age <= 122);
+            // <Gender> Male: 1, Female: 2, Other: 3
+            int genderData = stoi(record[12]);
+            assert(genderData == 1 || genderData == 2 || genderData == 3);
+            Gender gender = GENDER_INT_MAP.at(genderData);
+            int mask = age + static_cast<int>(gender) * 128 + 5;
             std::set<size_t> medicineIds;
             medicineIds.insert(medicineId);
             std::set<size_t> symptomIds;
@@ -132,7 +124,7 @@ int main(int argc, char* argv[])
     {
         size_t recordId = recordPair.first;
         Record record = recordPair.second;
-        size_t mask = record.maskValue;
+        int mask = record.maskValue;
         size_t medCount = record.medicineIds.size();
         size_t sideCount = record.symptomIds.size();
 

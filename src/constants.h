@@ -1,3 +1,4 @@
+#include <map>
 #include <string>
 
 const std::string SETTINGS_DIR_PATH = "../settings/";
@@ -12,3 +13,16 @@ const std::string FHE_SK_FILE_PATH = SETTINGS_DIR_PATH + "sk.bin";
 const std::string DBBASICS_FILE_PATH = SETTINGS_DIR_PATH + "dbbasics.bin";
 const std::string MED_INV_FILE_PATH = AUXDATA_DIR_PATH + "med.inv";
 const std::string SIDE_INV_FILE_PATH = AUXDATA_DIR_PATH + "side.inv";
+
+enum class Gender
+{
+    MALE = 0,
+    FEMALE = 1,
+    OTHER = 2
+};
+
+const std::map<int, Gender> GENDER_INT_MAP{
+  {1, Gender::MALE}, {2, Gender::FEMALE}, {3, Gender::OTHER}};
+
+const std::map<char, Gender> GENDER_CHAR_MAP{
+  {'m', Gender::MALE}, {'f', Gender::FEMALE}, {'o', Gender::OTHER}};

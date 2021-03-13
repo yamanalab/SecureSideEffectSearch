@@ -9,7 +9,7 @@
 
 #include "EncryptedArray.h"
 #include "FHE.h"
-#include "filepath_info.h"
+#include "constants.h"
 #include "timing.h"
 using namespace std;
 
