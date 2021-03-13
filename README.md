@@ -2,10 +2,11 @@
 
 #### Preemptive Knowledge
 
-- mask: a representation of age (m/f) and gender(0-122)
+- mask: a representation of age(0-122) and gender(m/f/o)
 ```
-mask = 128 + age + 5 (age == 'm')
-mask = age + 5 (age == 'f')
+mask = age + 5 (gender == 'm')
+mask = 128 + age + 5 (gender == 'f')
+mask = 256 + age + 5 (gender == 'o')
 ```
 
 #### Structure
