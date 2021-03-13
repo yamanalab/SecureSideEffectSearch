@@ -14,6 +14,15 @@ const std::string DBBASICS_FILE_PATH = SETTINGS_DIR_PATH + "dbbasics.bin";
 const std::string MED_INV_FILE_PATH = AUXDATA_DIR_PATH + "med.inv";
 const std::string SIDE_INV_FILE_PATH = AUXDATA_DIR_PATH + "side.inv";
 
+namespace csvcolumns
+{
+constexpr int ID_IDX = 0;
+constexpr int MEDICINE_ID_IDX = 1;
+constexpr int SYMPTOM_ID_IDX = 3;
+constexpr int AGE_IDX = 11;
+constexpr int GENDER_IDX = 12;
+} // namespace csvcolumns
+
 enum class Gender
 {
     MALE = 0,

@@ -49,17 +49,17 @@ int main(int argc, char* argv[])
     while (getline(csvIfs, line))
     {
         boost::algorithm::split(record, line, boost::is_any_of(","));
-        size_t id = stoi(record[0]);
-        size_t medicineId = stoi(record[1]);
-        size_t symptomId = stoi(record[3]);
+        size_t id = stoi(record[csvcolumns::ID_IDX]);
+        size_t medicineId = stoi(record[csvcolumns::MEDICINE_ID_IDX]);
+        size_t symptomId = stoi(record[csvcolumns::SYMPTOM_ID_IDX]);
         totalMedicines.insert(medicineId);
         totalSymptoms.insert(symptomId);
         if (records.count(id) == 0)
         {
-            int age = stoi(record[11]);
+            int age = stoi(record[csvcolumns::AGE_IDX]);
             assert(age >= 0 && age <= 122);
             // <Gender> Male: 1, Female: 2, Other: 3
-            int genderData = stoi(record[12]);
+            int genderData = stoi(record[csvcolumns::GENDER_IDX]);
             assert(genderData == 1 || genderData == 2 || genderData == 3);
             Gender gender = GENDER_INT_MAP.at(genderData);
             int mask = age + static_cast<int>(gender) * 128 + 5;
