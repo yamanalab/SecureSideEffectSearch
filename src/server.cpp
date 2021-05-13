@@ -70,6 +70,11 @@ vector<int> mergeOR(const map<int, vector<int>> &index, const vector<int> &id)
 
     if (len == 1)
     {
+        if (index.find(id[0]) == index.end())
+        {
+            vector<int> ret;
+            return ret;
+        }
         return index.at(id[0]);
     }
 
