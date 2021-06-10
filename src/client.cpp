@@ -74,16 +74,6 @@ public:
 int main(int argc, char* argv[])
 {
 
-    ifstream fdbbasics(DBBASICS_FILE_PATH, std::ios::binary);
-    bool dbstatus;
-    assert(fdbbasics >> dbstatus);
-    assert(dbstatus);
-    int numRec, totMed, totSide;
-    assert(fdbbasics >> numRec);
-    assert(fdbbasics >> totMed);
-    assert(fdbbasics >> totSide);
-    fdbbasics.close();
-
     ifstream fctxt(FHE_CONTEXT_FILE_PATH, std::ios::binary);
     unsigned long m, p, r;
     std::vector<long> gens, ords;
@@ -244,13 +234,15 @@ int main(int argc, char* argv[])
          << endl;
 
     Json json;
-    json.add<Record>("records", records, [](Record r) {
-        Json j;
-        j.add("id", r.id());
-        j.add("medicine_ids", r.medicinIds());
-        j.add("symptom_ids", r.symptomIds());
-        return j;
-    });
+    json.add<Record>("records", records,
+                     [](Record r)
+                     {
+                         Json j;
+                         j.add("id", r.id());
+                         j.add("medicine_ids", r.medicinIds());
+                         j.add("symptom_ids", r.symptomIds());
+                         return j;
+                     });
 
     cout << json.serialize() << endl;
 
