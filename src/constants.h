@@ -18,9 +18,12 @@ namespace csvcolumns
 {
 constexpr int ID_IDX = 0;
 constexpr int MEDICINE_ID_IDX = 1;
-constexpr int SYMPTOM_ID_IDX = 3;
-constexpr int AGE_IDX = 11;
-constexpr int GENDER_IDX = 12;
+// constexpr int SYMPTOM_ID_IDX = 3;
+constexpr int SYMPTOM_ID_IDX = 2;
+// constexpr int AGE_IDX = 11;
+constexpr int AGE_IDX = 8;
+// constexpr int GENDER_IDX = 12;
+constexpr int GENDER_IDX = 9;
 } // namespace csvcolumns
 
 enum class Gender
