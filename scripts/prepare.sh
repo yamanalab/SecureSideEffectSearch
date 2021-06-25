@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -eu
 
-DOWNLOADS_DIR="~/downloads"
 HELIB_INSTALL_DIR="/usr/local/src"
+DOWNLOAD_DIR="~/qs_downloads"
 
-export LD_LIBRARY_PATH=/usr/local/lib
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 apt-get update && \
 apt-get install -y git \
@@ -20,9 +20,13 @@ apt-get install -y git \
                    libarpack++2-dev \
                    libarmadillo-dev
 
-TEMP_DIR=$(mktemp -d "${DOWNLOADS_DIR}_XXXXXX")
+mkdir ${DOWNLOAD_DIR}
 
-cd ${TEMP_DIR}
+echo "=============="
+echo "Install gmp:"
+echo "=============="
+
+cd ${DOWNLOAD_DIR}
 wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz && \
   tar xf gmp-6.1.2 && \
   cd gmp-6.1.2 && \
@@ -30,7 +34,11 @@ wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.xz && \
   make && \
   make install
 
-cd ${TEMP_DIR}
+echo "=============="
+echo "Install NTL:"
+echo "=============="
+
+cd ${DOWNLOAD_DIR}
 wget https://www.shoup.net/ntl/ntl-11.3.2.tar.gz && \
   tar xf ntl-11.3.2.tar.gz && \
   cd ntl-11.3.2/src && \
@@ -38,7 +46,11 @@ wget https://www.shoup.net/ntl/ntl-11.3.2.tar.gz && \
   make -j4 && \
   make install
 
-rm -rf "${TEMP_DIR}"
+rm -rf "${DOWNLOAD_DIR}"
+
+echo "=============="
+echo "Install HElib:"
+echo "=============="
 
 mkdir -p ${HELIB_INSTALL_DIR} && \
   cd ${HELIB_INSTALL_DIR} && \
