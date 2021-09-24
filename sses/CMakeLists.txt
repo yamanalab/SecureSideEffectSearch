@@ -1,0 +1,3 @@
+add_subdirectory(sses_client)
+add_subdirectory(sses_server)
+add_subdirectory(sses_share)
