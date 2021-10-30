@@ -47,7 +47,7 @@ class DummyMaker(object):
                                     np.random.randint(0, 2),
                                     "",
                                     "myownshop",
-                                    rec['date time nowpatient_id'] + 1,
+                                    rec['patient_id'] + 1,
                                     rec['age'],
                                     rec['gender'],
                                     "",
