@@ -197,7 +197,7 @@ static void exec(const Option& option)
     encmask.encrypt(mask, pubkey);
 
     CallbackParam callback_param;
-    client.send_query(key_id,
+    auto queryID = client.send_query(key_id,
                       option.age,
                       option.gender,
                       option.meds,
@@ -205,8 +205,7 @@ static void exec(const Option& option)
                       encmask,
                       callback_func, &callback_param);
 
-    // wait for finish
-    usleep(600 * 1000 * 1000);
+    client.wait(queryID);
 }
 
 int main(int argc, char* argv[])
