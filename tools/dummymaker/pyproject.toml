@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "dummymaker"
+version = "0.1.0"
+description = ""
+authors = ["Yusheng Jiang <amadeus@yama.info.waseda.ac.jp>", "Kotaro Inoue <kinoue@yama.info.waseda.ac.jp>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.11"
+numpy = "^1.21.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
